@@ -24,6 +24,10 @@ function clearSafetyTimeout() {
 }
 
 export function startListening(onResult, onError) {
+  if (isListening) {
+    return;
+  }
+
   const Recognition =
     SpeechRecognition ||
     (typeof window !== "undefined"
@@ -37,7 +41,11 @@ export function startListening(onResult, onError) {
 
   if (recognition) {
     recognition.onend = null;
-    recognition.stop();
+    try {
+      recognition.stop();
+    } catch (err) {
+      // Prevents uncaught exceptions if stop fails
+    }
   }
 
   clearSafetyTimeout();
@@ -105,14 +113,27 @@ export function startListening(onResult, onError) {
     }
   };
 
-  recognition.start();
+  try {
+    recognition.start();
+  } catch (err) {
+    // Prevents uncaught exceptions if duplicate start occurs
+  }
 }
 
 export function stopListening() {
+  if (!isListening) {
+    return;
+  }
+
   isListening = false;
   clearSafetyTimeout();
   lastKnownTranscript = null;
   if (recognition) {
-    recognition.stop();
+    try {
+      recognition.stop();
+    } catch (err) {
+      // Prevents uncaught exceptions if already stopped
+    }
+    recognition = null;
   }
 }
