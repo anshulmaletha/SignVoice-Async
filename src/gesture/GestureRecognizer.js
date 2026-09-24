@@ -1,4 +1,5 @@
 import { FilesetResolver, GestureRecognizer } from '@mediapipe/tasks-vision';
+import { mapGesture } from './gestureMap';
 
 // Official MediaPipe hosted model and wasm paths
 const MEDIAPIPE_WASM_PATH = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm';
@@ -71,16 +72,16 @@ export async function initializeGestureRecognizer() {
  * Starts continuous gesture recognition on an HTMLVideoElement.
  *
  * CONCEPTUAL INTERFACE:
- * startGestureRecognition(videoElement, onRawResult, options)
+ * startGestureRecognition(videoElement, onResult, options)
  *
  * @param {HTMLVideoElement} videoElement - Live HTML video element with webcam stream.
- * @param {Function} onRawResult - Callback receiving raw result: { categoryName: string, score: number }.
+ * @param {Function} onResult - Callback receiving GESTURE_OUTPUT: { gesture: string, text: string, confidence: number, timestamp: number }.
  * @param {Object} [options] - Configuration options.
  * @param {number} [options.logIntervalMs=300] - Interval to throttle console output (default 300ms).
  * @param {boolean} [options.enableConsoleLogging=true] - Whether to print formatted logs to console.
  * @returns {Promise<{ stop: Function, isRunning: Function }>} Control object to stop recognition.
  */
-export async function startGestureRecognition(videoElement, onRawResult, options = {}) {
+export async function startGestureRecognition(videoElement, onResult, options = {}) {
   const {
     logIntervalMs = 300,
     enableConsoleLogging = true
@@ -100,7 +101,7 @@ export async function startGestureRecognition(videoElement, onRawResult, options
   let lastVideoTime = -1;
   let lastTimestamp = 0;
   let lastLogTime = 0;
-  let lastCategory = null;
+  let lastGesture = null;
 
   const processFrame = () => {
     if (!isRunning) {
@@ -142,32 +143,30 @@ export async function startGestureRecognition(videoElement, onRawResult, options
             score = typeof topGesture.score === 'number' ? topGesture.score : 0;
           }
 
-          const rawResult = {
-            categoryName,
-            score
-          };
+          // Task A2: Map raw MediaPipe category to frozen GESTURE_OUTPUT contract
+          const gestureResult = mapGesture(categoryName, score, Date.now());
 
-          // Deliver raw result to callback
-          if (typeof onRawResult === 'function') {
+          // Deliver GESTURE_OUTPUT to callback
+          if (typeof onResult === 'function') {
             try {
-              onRawResult(rawResult);
+              onResult(gestureResult);
             } catch (cbErr) {
-              console.error('[GestureRecognizer] Error in onRawResult callback:', cbErr);
+              console.error('[GestureRecognizer] Error in onResult callback:', cbErr);
             }
           }
 
-          // Step 9: Throttled console logging
+          // Step 9: Throttled console logging of mapped gesture output
           const now = performance.now();
-          const categoryChanged = categoryName !== lastCategory;
+          const gestureChanged = gestureResult.gesture !== lastGesture;
           if (
             enableConsoleLogging &&
-            (categoryChanged || now - lastLogTime >= logIntervalMs)
+            (gestureChanged || now - lastLogTime >= logIntervalMs)
           ) {
             console.log(
-              `[GestureRecognizer] category: ${categoryName} | score: ${score.toFixed(2)}`
+              `[GestureRecognizer] gesture: ${gestureResult.gesture} (${gestureResult.text}) | confidence: ${gestureResult.confidence.toFixed(2)}`
             );
             lastLogTime = now;
-            lastCategory = categoryName;
+            lastGesture = gestureResult.gesture;
           }
         }
       }

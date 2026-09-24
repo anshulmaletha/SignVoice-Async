@@ -5,7 +5,12 @@ export default function App() {
   const videoRef = useRef(null);
   const [status, setStatus] = useState('Idle');
   const [error, setError] = useState(null);
-  const [currentGesture, setCurrentGesture] = useState({ categoryName: 'None', score: 0 });
+  const [currentGesture, setCurrentGesture] = useState({
+    gesture: 'NONE',
+    text: '',
+    confidence: 0,
+    timestamp: 0
+  });
   const recognitionControlRef = useRef(null);
   const streamRef = useRef(null);
 
@@ -49,9 +54,9 @@ export default function App() {
 
       const control = await startGestureRecognition(
         videoRef.current,
-        (rawResult) => {
-          // Callback receives raw result: { categoryName, score }
-          setCurrentGesture(rawResult);
+        (gestureResult) => {
+          // Callback receives GESTURE_OUTPUT contract: { gesture, text, confidence, timestamp }
+          setCurrentGesture(gestureResult);
         },
         {
           logIntervalMs: 300,
@@ -87,7 +92,7 @@ export default function App() {
       videoRef.current.srcObject = null;
     }
     setStatus('Stopped');
-    setCurrentGesture({ categoryName: 'None', score: 0 });
+    setCurrentGesture({ gesture: 'NONE', text: '', confidence: 0, timestamp: 0 });
   };
 
   useEffect(() => {
@@ -104,7 +109,7 @@ export default function App() {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'monospace' }}>
-      <h2>SignVoice — Task A1 Test Harness (Console Only)</h2>
+      <h2>SignVoice — Task A2 Test Harness (GESTURE_OUTPUT Contract)</h2>
       <p>
         <strong>Status:</strong> {status}
       </p>
@@ -146,15 +151,21 @@ export default function App() {
             padding: '10px',
             border: '1px solid #ddd',
             backgroundColor: '#f9f9f9',
-            minWidth: '240px'
+            minWidth: '280px'
           }}
         >
-          <h4>Current Raw Output</h4>
+          <h4>Current GESTURE_OUTPUT</h4>
           <p>
-            <strong>categoryName:</strong> {currentGesture.categoryName}
+            <strong>gesture:</strong> {currentGesture.gesture}
           </p>
           <p>
-            <strong>score:</strong> {currentGesture.score.toFixed(2)}
+            <strong>text:</strong> {currentGesture.text || '""'}
+          </p>
+          <p>
+            <strong>confidence:</strong> {currentGesture.confidence ? currentGesture.confidence.toFixed(2) : 0}
+          </p>
+          <p>
+            <strong>timestamp:</strong> {currentGesture.timestamp}
           </p>
           <small>Open DevTools Console (F12) for real-time logs.</small>
         </div>
