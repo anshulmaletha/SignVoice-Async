@@ -3,8 +3,19 @@ const SpeechRecognition =
     ? window.SpeechRecognition || window.webkitSpeechRecognition
     : null;
 
+const FINAL_TIMEOUT_MS = 4000;
+
 let recognition = null;
 let isListening = false;
+let safetyTimeoutId = null;
+let lastKnownTranscript = null;
+
+function clearSafetyTimeout() {
+  if (safetyTimeoutId) {
+    clearTimeout(safetyTimeoutId);
+    safetyTimeoutId = null;
+  }
+}
 
 export function startListening(onResult, onError) {
   const Recognition =
@@ -23,6 +34,8 @@ export function startListening(onResult, onError) {
     recognition.stop();
   }
 
+  clearSafetyTimeout();
+  lastKnownTranscript = null;
   isListening = true;
 
   recognition = new Recognition();
@@ -35,6 +48,27 @@ export function startListening(onResult, onError) {
     if (latestResult && latestResult[0]) {
       const text = latestResult[0].transcript;
       const isFinal = latestResult.isFinal;
+
+      clearSafetyTimeout();
+
+      if (isFinal) {
+        lastKnownTranscript = null;
+      } else {
+        lastKnownTranscript = text;
+        safetyTimeoutId = setTimeout(() => {
+          if (isListening && lastKnownTranscript) {
+            if (typeof onResult === "function") {
+              onResult({
+                text: lastKnownTranscript,
+                isFinal: true,
+                timestamp: Date.now(),
+              });
+            }
+            lastKnownTranscript = null;
+            safetyTimeoutId = null;
+          }
+        }, FINAL_TIMEOUT_MS);
+      }
 
       if (typeof onResult === "function") {
         onResult({
@@ -67,6 +101,8 @@ export function startListening(onResult, onError) {
 
 export function stopListening() {
   isListening = false;
+  clearSafetyTimeout();
+  lastKnownTranscript = null;
   if (recognition) {
     recognition.stop();
   }
