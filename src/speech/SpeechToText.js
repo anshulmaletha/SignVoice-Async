@@ -5,6 +5,12 @@ const SpeechRecognition =
 
 const FINAL_TIMEOUT_MS = 4000;
 
+const ERROR_MAP = {
+  "not-allowed": "PERMISSION_DENIED",
+  "no-speech": "NO_SPEECH_DETECTED",
+  "network": "NETWORK_ERROR",
+};
+
 let recognition = null;
 let isListening = false;
 let safetyTimeoutId = null;
@@ -82,7 +88,10 @@ export function startListening(onResult, onError) {
 
   recognition.onerror = (event) => {
     if (typeof onError === "function" && event && event.error) {
-      onError(event.error);
+      const mappedCode = ERROR_MAP[event.error];
+      if (mappedCode) {
+        onError(mappedCode);
+      }
     }
   };
 
