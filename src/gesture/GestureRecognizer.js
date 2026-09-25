@@ -164,7 +164,7 @@ export async function startGestureRecognition(videoElement, onResult, options = 
             currentCandidate !== lastEmittedCandidate
           ) {
             // Task A2: Map raw MediaPipe category to frozen GESTURE_OUTPUT contract
-            const gestureResult = mapGesture(currentCandidate, score, Date.now());
+            const gestureResult = mapGesture(currentCandidate, score, new Date().toLocaleTimeString());
 
             lastEmittedCandidate = currentCandidate;
 

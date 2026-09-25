@@ -9,7 +9,7 @@ export default function App() {
     gesture: 'NONE',
     text: '',
     confidence: 0,
-    timestamp: 0
+    timestamp: new Date().toLocaleTimeString()
   });
   const recognitionControlRef = useRef(null);
   const streamRef = useRef(null);
@@ -92,7 +92,7 @@ export default function App() {
       videoRef.current.srcObject = null;
     }
     setStatus('Stopped');
-    setCurrentGesture({ gesture: 'NONE', text: '', confidence: 0, timestamp: 0 });
+    setCurrentGesture({ gesture: 'NONE', text: '', confidence: 0, timestamp: new Date().toLocaleTimeString() });
   };
 
   useEffect(() => {

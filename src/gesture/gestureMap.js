@@ -25,26 +25,44 @@ export const GESTURE_MAP = Object.freeze({
   }
 });
 
+// Named constant for minimum confidence threshold (Task A5)
+// Classifications with score < CONFIDENCE_THRESHOLD fall back to UNKNOWN
+export const CONFIDENCE_THRESHOLD = 0.6;
+
 /**
  * Maps a raw MediaPipe gesture detection result to the frozen SignVoice GESTURE_OUTPUT contract.
  *
  * Case 1: No hand detected -> gesture: "NONE", text: "", confidence: 0
- * Case 2: Supported gesture -> gesture: "<CODE>", text: "<Text>", confidence: score
- * Case 3: Unsupported gesture -> gesture: "UNKNOWN", text: "Gesture not recognized", confidence: score
+ * Case 2: Hand detected but confidence < CONFIDENCE_THRESHOLD -> gesture: "UNKNOWN", text: "Gesture not recognized", confidence: score
+ * Case 3: Supported gesture with confidence >= CONFIDENCE_THRESHOLD -> gesture: "<CODE>", text: "<Text>", confidence: score
+ * Case 4: Unsupported gesture -> gesture: "UNKNOWN", text: "Gesture not recognized", confidence: score
  *
  * @param {string} categoryName - Raw category name from MediaPipe (or 'None' / empty).
  * @param {number} [score=0] - MediaPipe confidence score (0.0 to 1.0).
- * @param {number} [timestamp=Date.now()] - Timestamp in milliseconds.
- * @returns {{ gesture: string, text: string, confidence: number, timestamp: number }}
+ * @param {string|number} [timestamp=new Date().toLocaleTimeString()] - Human-readable time string.
+ * @returns {{ gesture: string, text: string, confidence: number, timestamp: string }}
  */
-export function mapGesture(categoryName, score = 0, timestamp = Date.now()) {
+export function mapGesture(categoryName, score = 0, timestamp = new Date().toLocaleTimeString()) {
+  const numericScore = typeof score === 'number' ? score : 0;
+  const timeString = typeof timestamp === 'string' ? timestamp : new Date().toLocaleTimeString();
+
   // Case 1: No hand detected
   if (!categoryName || categoryName === 'None') {
     return {
       gesture: 'NONE',
       text: '',
       confidence: 0,
-      timestamp
+      timestamp: timeString
+    };
+  }
+
+  // Task A5: Confidence gate - fall back to UNKNOWN if score is below threshold
+  if (numericScore < CONFIDENCE_THRESHOLD) {
+    return {
+      gesture: 'UNKNOWN',
+      text: 'Gesture not recognized',
+      confidence: numericScore,
+      timestamp: timeString
     };
   }
 
@@ -54,21 +72,22 @@ export function mapGesture(categoryName, score = 0, timestamp = Date.now()) {
     return {
       gesture: matched.gesture,
       text: matched.text,
-      confidence: typeof score === 'number' ? score : 0,
-      timestamp
+      confidence: numericScore,
+      timestamp: timeString
     };
   }
 
-  // Case 2: Hand detected but unsupported gesture
+  // Case 4: Hand detected but unsupported gesture
   return {
     gesture: 'UNKNOWN',
     text: 'Gesture not recognized',
-    confidence: typeof score === 'number' ? score : 0,
-    timestamp
+    confidence: numericScore,
+    timestamp: timeString
   };
 }
 
 export default {
   GESTURE_MAP,
+  CONFIDENCE_THRESHOLD,
   mapGesture
 };

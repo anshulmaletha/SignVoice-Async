@@ -97,7 +97,7 @@ export function startMockGestureStream(onResult, intervalMs = 3000, emitImmediat
       gesture: item.gesture,
       text: item.text,
       confidence: item.confidence,
-      timestamp: Date.now()
+      timestamp: new Date().toLocaleTimeString()
     };
 
     console.log(
