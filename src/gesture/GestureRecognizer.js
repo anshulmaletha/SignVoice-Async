@@ -1,5 +1,9 @@
 import { FilesetResolver, GestureRecognizer } from '@mediapipe/tasks-vision';
-import { mapGesture } from './gestureMap';
+import { mapGesture } from './gestureMap.js';
+
+// Named constant for gesture stabilization / debounce threshold (Task A4)
+// Approximately 15 consecutive frames = ~500ms at 30 FPS
+export const STABLE_FRAME_THRESHOLD = 15;
 
 // Official MediaPipe hosted model and wasm paths
 const MEDIAPIPE_WASM_PATH = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm';
@@ -77,13 +81,11 @@ export async function initializeGestureRecognizer() {
  * @param {HTMLVideoElement} videoElement - Live HTML video element with webcam stream.
  * @param {Function} onResult - Callback receiving GESTURE_OUTPUT: { gesture: string, text: string, confidence: number, timestamp: number }.
  * @param {Object} [options] - Configuration options.
- * @param {number} [options.logIntervalMs=300] - Interval to throttle console output (default 300ms).
  * @param {boolean} [options.enableConsoleLogging=true] - Whether to print formatted logs to console.
  * @returns {Promise<{ stop: Function, isRunning: Function }>} Control object to stop recognition.
  */
 export async function startGestureRecognition(videoElement, onResult, options = {}) {
   const {
-    logIntervalMs = 300,
     enableConsoleLogging = true
   } = options;
 
@@ -100,8 +102,11 @@ export async function startGestureRecognition(videoElement, onResult, options = 
   let animationFrameId = null;
   let lastVideoTime = -1;
   let lastTimestamp = 0;
-  let lastLogTime = 0;
-  let lastGesture = null;
+
+  // Task A4: State across frames for debounce / stabilization
+  let currentCandidate = null;
+  let consecutiveCount = 0;
+  let lastEmittedCandidate = null;
 
   const processFrame = () => {
     if (!isRunning) {
@@ -143,30 +148,41 @@ export async function startGestureRecognition(videoElement, onResult, options = 
             score = typeof topGesture.score === 'number' ? topGesture.score : 0;
           }
 
-          // Task A2: Map raw MediaPipe category to frozen GESTURE_OUTPUT contract
-          const gestureResult = mapGesture(categoryName, score, Date.now());
-
-          // Deliver GESTURE_OUTPUT to callback
-          if (typeof onResult === 'function') {
-            try {
-              onResult(gestureResult);
-            } catch (cbErr) {
-              console.error('[GestureRecognizer] Error in onResult callback:', cbErr);
-            }
+          // Task A4: Frame counter and stability check
+          if (categoryName === currentCandidate) {
+            consecutiveCount++;
+          } else {
+            currentCandidate = categoryName;
+            consecutiveCount = 1;
           }
 
-          // Step 9: Throttled console logging of mapped gesture output
-          const now = performance.now();
-          const gestureChanged = gestureResult.gesture !== lastGesture;
+          // Emit GESTURE_OUTPUT only when:
+          // A. Same categoryName detected for STABLE_FRAME_THRESHOLD consecutive frames, AND
+          // B. Gesture has NOT already been emitted during current hold
           if (
-            enableConsoleLogging &&
-            (gestureChanged || now - lastLogTime >= logIntervalMs)
+            consecutiveCount >= STABLE_FRAME_THRESHOLD &&
+            currentCandidate !== lastEmittedCandidate
           ) {
-            console.log(
-              `[GestureRecognizer] gesture: ${gestureResult.gesture} (${gestureResult.text}) | confidence: ${gestureResult.confidence.toFixed(2)}`
-            );
-            lastLogTime = now;
-            lastGesture = gestureResult.gesture;
+            // Task A2: Map raw MediaPipe category to frozen GESTURE_OUTPUT contract
+            const gestureResult = mapGesture(currentCandidate, score, Date.now());
+
+            lastEmittedCandidate = currentCandidate;
+
+            // Deliver GESTURE_OUTPUT to callback (exactly once per stable hold)
+            if (typeof onResult === 'function') {
+              try {
+                onResult(gestureResult);
+              } catch (cbErr) {
+                console.error('[GestureRecognizer] Error in onResult callback:', cbErr);
+              }
+            }
+
+            // Step 9 & A4: Lightweight console logging for emitted gesture output
+            if (enableConsoleLogging) {
+              console.log(
+                `[GestureRecognizer] Stably emitted gesture: ${gestureResult.gesture} (${gestureResult.text}) | confidence: ${gestureResult.confidence.toFixed(2)}`
+              );
+            }
           }
         }
       }
