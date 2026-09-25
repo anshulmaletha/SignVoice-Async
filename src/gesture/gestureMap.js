@@ -22,6 +22,10 @@ export const GESTURE_MAP = Object.freeze({
   ILoveYou: {
     gesture: 'THANK_YOU',
     text: 'Thank you'
+  },
+  Closed_Fist: {
+    gesture: 'STOP',
+    text: 'Stop'
   }
 });
 
