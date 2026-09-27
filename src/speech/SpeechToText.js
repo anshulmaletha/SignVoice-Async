@@ -1,9 +1,15 @@
+import { subscribeTtsState, isTtsSpeaking } from '../audio/TextToSpeech.js';
+
 const SpeechRecognition =
   typeof window !== "undefined"
     ? window.SpeechRecognition || window.webkitSpeechRecognition
     : null;
 
-const FINAL_TIMEOUT_MS = 4000;
+// Natural pause threshold: 800ms (between 0.5s - 1.0s) after user stops speaking
+export const PAUSE_THRESHOLD_MS = 800;
+
+// Audio recovery settling delay: 250ms (between 200–300ms) after TTS speaker output ends
+export const TTS_RECOVERY_DELAY_MS = 250;
 
 const ERROR_MAP = {
   "not-allowed": "PERMISSION_DENIED",
@@ -12,22 +18,31 @@ const ERROR_MAP = {
 };
 
 let recognition = null;
-let isListening = false;
-let safetyTimeoutId = null;
+let isUserListening = false;
+let isTtsSuppressed = false;
+let pauseTimeoutId = null;
+let recoveryTimeoutId = null;
 let lastKnownTranscript = null;
+let lastFinalizedIndex = -1;
+let currentActiveIndex = -1;
+let activeOnResult = null;
+let activeOnError = null;
 
-function clearSafetyTimeout() {
-  if (safetyTimeoutId) {
-    clearTimeout(safetyTimeoutId);
-    safetyTimeoutId = null;
+function clearPauseTimeout() {
+  if (pauseTimeoutId) {
+    clearTimeout(pauseTimeoutId);
+    pauseTimeoutId = null;
   }
 }
 
-export function startListening(onResult, onError) {
-  if (isListening) {
-    return;
+function clearRecoveryTimeout() {
+  if (recoveryTimeoutId) {
+    clearTimeout(recoveryTimeoutId);
+    recoveryTimeoutId = null;
   }
+}
 
+function startRecognitionSession() {
   const Recognition =
     SpeechRecognition ||
     (typeof window !== "undefined"
@@ -43,14 +58,14 @@ export function startListening(onResult, onError) {
     recognition.onend = null;
     try {
       recognition.stop();
-    } catch (err) {
-      // Prevents uncaught exceptions if stop fails
-    }
+    } catch (err) {}
+    recognition = null;
   }
 
-  clearSafetyTimeout();
+  clearPauseTimeout();
   lastKnownTranscript = null;
-  isListening = true;
+  lastFinalizedIndex = -1;
+  currentActiveIndex = -1;
 
   recognition = new Recognition();
   recognition.continuous = true;
@@ -58,57 +73,123 @@ export function startListening(onResult, onError) {
   recognition.lang = "en-US";
 
   recognition.onresult = (event) => {
-    const latestResult = event.results[event.results.length - 1];
-    if (latestResult && latestResult[0]) {
-      const text = latestResult[0].transcript;
-      const isFinal = latestResult.isFinal;
+    // Guard: Drop all audio results arriving while TTS is speaking or in recovery window
+    if (isTtsSuppressed || isTtsSpeaking()) {
+      clearPauseTimeout();
+      lastKnownTranscript = null;
+      lastFinalizedIndex = event.results.length - 1;
+      return;
+    }
 
-      clearSafetyTimeout();
+    const results = event.results;
+    const currentIndex = results.length - 1;
+    currentActiveIndex = currentIndex;
 
-      if (isFinal) {
-        lastKnownTranscript = null;
-      } else {
-        lastKnownTranscript = text;
-        safetyTimeoutId = setTimeout(() => {
-          if (isListening && lastKnownTranscript) {
-            if (typeof onResult === "function") {
-              onResult({
-                text: lastKnownTranscript,
-                isFinal: true,
-                timestamp: Date.now(),
-              });
-            }
-            lastKnownTranscript = null;
-            safetyTimeoutId = null;
-          }
-        }, FINAL_TIMEOUT_MS);
-      }
+    const latestResult = results[currentIndex];
+    if (!latestResult || !latestResult[0]) {
+      return;
+    }
 
-      if (typeof onResult === "function") {
-        onResult({
-          text,
-          isFinal,
+    const text = latestResult[0].transcript;
+    const isNativeFinal = latestResult.isFinal;
+
+    // If this result index was already finalized (e.g. by our natural pause timer), ignore duplicate native final events
+    if (currentIndex <= lastFinalizedIndex) {
+      return;
+    }
+
+    clearPauseTimeout();
+
+    if (isNativeFinal) {
+      // Browser engine emitted final before pause timer
+      lastFinalizedIndex = currentIndex;
+      lastKnownTranscript = null;
+      if (typeof activeOnResult === "function") {
+        activeOnResult({
+          text: text.trim(),
+          isFinal: true,
           timestamp: Date.now(),
         });
       }
+    } else {
+      // Real-time interim result: emit immediately for zero-delay live captioning
+      lastKnownTranscript = text;
+
+      if (typeof activeOnResult === "function") {
+        activeOnResult({
+          text,
+          isFinal: false,
+          timestamp: Date.now(),
+        });
+      }
+
+      // Schedule finalization after natural pause (800ms of silence)
+      pauseTimeoutId = setTimeout(() => {
+        if (
+          isUserListening &&
+          !isTtsSuppressed &&
+          !isTtsSpeaking() &&
+          lastKnownTranscript &&
+          lastFinalizedIndex < currentIndex
+        ) {
+          lastFinalizedIndex = currentIndex;
+          const finalText = lastKnownTranscript.trim();
+          lastKnownTranscript = null;
+          pauseTimeoutId = null;
+
+          if (finalText && typeof activeOnResult === "function") {
+            activeOnResult({
+              text: finalText,
+              isFinal: true,
+              timestamp: Date.now(),
+            });
+          }
+        }
+      }, PAUSE_THRESHOLD_MS);
     }
   };
 
   recognition.onerror = (event) => {
-    if (typeof onError === "function" && event && event.error) {
+    if (typeof activeOnError === "function" && event && event.error) {
       const mappedCode = ERROR_MAP[event.error];
       if (mappedCode) {
-        onError(mappedCode);
+        activeOnError(mappedCode);
       }
     }
   };
 
   recognition.onend = () => {
-    if (isListening) {
+    // Guard: Do NOT restart recognition if TTS is active or suppressed
+    if (isTtsSuppressed || isTtsSpeaking()) {
+      return;
+    }
+
+    if (isUserListening) {
+      // Flush any pending transcript before restart
+      if (
+        lastKnownTranscript &&
+        lastKnownTranscript.trim() &&
+        lastFinalizedIndex < currentActiveIndex
+      ) {
+        lastFinalizedIndex = currentActiveIndex;
+        const finalText = lastKnownTranscript.trim();
+        lastKnownTranscript = null;
+        clearPauseTimeout();
+
+        if (typeof activeOnResult === "function") {
+          activeOnResult({
+            text: finalText,
+            isFinal: true,
+            timestamp: Date.now(),
+          });
+        }
+      }
+
       try {
         recognition.start();
       } catch (err) {
-        // Prevents uncaught exceptions if restart fails
+        // If restart fails, safely recreate session
+        startRecognitionSession();
       }
     }
   };
@@ -120,20 +201,93 @@ export function startListening(onResult, onError) {
   }
 }
 
-export function stopListening() {
-  if (!isListening) {
+// Subscribe to global TTS state changes for automatic echo suppression & recovery
+subscribeTtsState((ttsActive) => {
+  if (ttsActive) {
+    // 1. TTS started: mark suppressed immediately
+    isTtsSuppressed = true;
+    clearRecoveryTimeout();
+    clearPauseTimeout();
+    lastKnownTranscript = null;
+
+    // Temporarily pause/stop STT recognition so microphone does not capture TTS speaker output
+    if (recognition) {
+      try {
+        recognition.onend = null;
+        recognition.stop();
+      } catch (err) {}
+      recognition = null;
+    }
+  } else {
+    // 2. TTS ended: wait 250ms recovery settling window before resuming STT
+    clearRecoveryTimeout();
+    recoveryTimeoutId = setTimeout(() => {
+      isTtsSuppressed = false;
+      recoveryTimeoutId = null;
+      lastKnownTranscript = null;
+
+      // 3. Resume STT ONLY IF user had microphone enabled before TTS started
+      if (isUserListening && !recognition) {
+        startRecognitionSession();
+      }
+    }, TTS_RECOVERY_DELAY_MS);
+  }
+});
+
+export function startListening(onResult, onError) {
+  isUserListening = true;
+  activeOnResult = onResult;
+  activeOnError = onError;
+
+  // If TTS is currently speaking or in recovery, wait for TTS to finish and settle
+  if (isTtsSuppressed || isTtsSpeaking()) {
     return;
   }
 
-  isListening = false;
-  clearSafetyTimeout();
+  startRecognitionSession();
+}
+
+export function stopListening(onResult) {
+  isUserListening = false;
+  activeOnResult = null;
+  activeOnError = null;
+
+  clearRecoveryTimeout();
+  clearPauseTimeout();
+
+  // If user stopped mic while speaking, finalize immediately so words aren't lost
+  if (
+    lastKnownTranscript &&
+    lastKnownTranscript.trim() &&
+    lastFinalizedIndex < currentActiveIndex &&
+    !isTtsSuppressed &&
+    !isTtsSpeaking()
+  ) {
+    lastFinalizedIndex = currentActiveIndex;
+    const finalText = lastKnownTranscript.trim();
+    if (typeof onResult === "function") {
+      onResult({
+        text: finalText,
+        isFinal: true,
+        timestamp: Date.now(),
+      });
+    }
+  }
+
   lastKnownTranscript = null;
+
   if (recognition) {
     try {
+      recognition.onend = null;
       recognition.stop();
-    } catch (err) {
-      // Prevents uncaught exceptions if already stopped
-    }
+    } catch (err) {}
     recognition = null;
   }
 }
+
+export default {
+  startListening,
+  stopListening,
+  PAUSE_THRESHOLD_MS,
+  TTS_RECOVERY_DELAY_MS,
+};

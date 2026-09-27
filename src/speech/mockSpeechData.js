@@ -2,18 +2,18 @@
  * mockSpeechData.js
  * Deterministic mock speech-recognition stream for Day 1 testing (Task B3).
  * Simulates the sentence "How are you today" with interim results resolving
- * to one final result every 6-second cycle.
+ * to one final result with ~800ms natural pause finalization.
  */
 
 const SCRIPTED_STEPS = [
-  { text: "How", isFinal: false, offsetMs: 800 },
-  { text: "How are", isFinal: false, offsetMs: 1600 },
-  { text: "How are you", isFinal: false, offsetMs: 2400 },
-  { text: "How are you today", isFinal: false, offsetMs: 3200 },
-  { text: "How are you today", isFinal: true, offsetMs: 4000 },
+  { text: "How", isFinal: false, offsetMs: 250 },
+  { text: "How are", isFinal: false, offsetMs: 500 },
+  { text: "How are you", isFinal: false, offsetMs: 750 },
+  { text: "How are you today", isFinal: false, offsetMs: 1000 },
+  { text: "How are you today", isFinal: true, offsetMs: 1800 },
 ];
 
-const CYCLE_DURATION_MS = 6000;
+const CYCLE_DURATION_MS = 4500;
 
 let intervalId = null;
 let timeoutIds = [];

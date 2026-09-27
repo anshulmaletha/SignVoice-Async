@@ -5,7 +5,7 @@ import ClearConversationButton from './ClearConversationButton.jsx'
 
 export default function ConversationHistory() {
   const [messages, setMessages] = useState(getMessages())
-  const bottomRef = useRef(null)
+  const listRef = useRef(null)
 
   useEffect(() => {
     const unsubscribe = subscribe((updated) => setMessages(updated))
@@ -13,24 +13,43 @@ export default function ConversationHistory() {
   }, [])
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (listRef.current) {
+      listRef.current.scrollTo({
+        top: listRef.current.scrollHeight,
+        behavior: 'smooth',
+      })
+    }
   }, [messages])
 
   return (
-    <div className="conversation-history">
+    <section className="conversation-history" aria-label="Conversation Feed">
       <div className="conversation-history__header">
-        <h2>Conversation</h2>
-        <ClearConversationButton />
+        <div className="conversation-history__title-group">
+          <h2>Live Conversation</h2>
+          <span className="conversation-history__count">
+            {messages.length} {messages.length === 1 ? 'message' : 'messages'}
+          </span>
+        </div>
+        {messages.length > 0 && <ClearConversationButton />}
       </div>
-      <div className="conversation-history__list">
-        {messages.length === 0 && (
-          <p className="conversation-history__empty">No messages yet.</p>
+      <div
+        className="conversation-history__list"
+        ref={listRef}
+        role="log"
+        aria-live="polite"
+      >
+        {messages.length === 0 ? (
+          <div className="conversation-history__empty">
+            <span className="conversation-history__empty-icon">💬</span>
+            <p>No messages yet.</p>
+            <small>Sign to the camera or speak into the microphone to begin.</small>
+          </div>
+        ) : (
+          messages.map((m) => (
+            <ConversationMessageItem key={m.id} message={m} />
+          ))
         )}
-        {messages.map((m) => (
-          <ConversationMessageItem key={m.id} message={m} />
-        ))}
-        <div ref={bottomRef} />
       </div>
-    </div>
+    </section>
   )
 }

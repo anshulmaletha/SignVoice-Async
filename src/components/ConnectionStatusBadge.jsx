@@ -5,7 +5,8 @@ export default function ConnectionStatusBadge({ isReady }) {
         isReady ? 'connection-status--ready' : 'connection-status--loading'
       }`}
     >
-      {isReady ? 'Ready' : 'Loading model...'}
+      <span className="connection-status__dot" />
+      {isReady ? 'Camera Ready' : 'Loading model...'}
     </div>
   )
 }

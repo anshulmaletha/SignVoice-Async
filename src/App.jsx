@@ -9,11 +9,15 @@ export default function App() {
   return (
     <div className="app">
       <Header />
-      <div className="app__panels">
-        <SignUserPanel />
-        <SpeechUserPanel />
-      </div>
-      <ConversationHistory />
+      <main className="app__workspace">
+        <aside className="app__left-col" aria-label="Sign Language & Camera Feed">
+          <SignUserPanel />
+        </aside>
+        <section className="app__right-col" aria-label="Speech & Conversation History">
+          <SpeechUserPanel />
+          <ConversationHistory />
+        </section>
+      </main>
     </div>
   )
 }

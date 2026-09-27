@@ -123,15 +123,31 @@ export default function SignUserPanel() {
 
   return (
     <div className="sign-user-panel">
-      <ConnectionStatusBadge isReady={isReady} />
+      <div className="sign-user-panel__header">
+        <ConnectionStatusBadge isReady={isReady} />
+        <span className="panel-tag">VISION ENGINE</span>
+      </div>
       {errorCode && <PermissionBanner type="camera" code={errorCode} />}
-      <CameraFeed videoRef={videoRef} error={errorCode} />
+      <CameraFeed videoRef={videoRef} error={errorCode} isReady={isReady} />
       <GestureBadge gesture={current.gesture} text={current.text} />
       <ConfidenceBar confidence={current.confidence} />
-      <div className="sign-to-speech-result">
-        <span className="sign-to-speech-result__icon">{'\u{1F50A}'}</span>
+      <div className={`sign-to-speech-result ${isSpeaking ? 'sign-to-speech-result--active' : ''}`}>
+        <span className="sign-to-speech-result__icon">
+          {isSpeaking ? '🔊' : '🔈'}
+        </span>
         <span className="sign-to-speech-result__text">
-          {isSpeaking ? 'Speaking…' : lastSpoken ? `Last: "${lastSpoken}"` : 'Waiting for a gesture…'}
+          {isSpeaking ? (
+            <span className="speaking-indicator">
+              Speaking
+              <span className="dot-pulse">.</span>
+              <span className="dot-pulse">.</span>
+              <span className="dot-pulse">.</span>
+            </span>
+          ) : lastSpoken ? (
+            `Last spoken: "${lastSpoken}"`
+          ) : (
+            'Waiting for a gesture…'
+          )}
         </span>
       </div>
     </div>
