@@ -3,7 +3,7 @@ import React from 'react'
 export default function Sidebar({ activeNav = 'sign-speak', onNavClick }) {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: 'grid' },
-    { id: 'sign-speak', label: 'Sign & Speak', icon: 'camera-spark', active: true, badge: 'Live' },
+    { id: 'sign-speak', label: 'Sign & Speak', icon: 'camera-spark', badge: 'Live' },
     { id: 'sessions', label: 'Sessions', icon: 'clock' },
     { id: 'friends', label: 'Friends', icon: 'users' },
     { id: 'settings', label: 'Settings', icon: 'settings' },
@@ -13,7 +13,13 @@ export default function Sidebar({ activeNav = 'sign-speak', onNavClick }) {
     <aside className="app-sidebar" aria-label="Main Navigation">
       <div className="app-sidebar__top">
         {/* Brand Header */}
-        <div className="app-sidebar__brand">
+        <div
+          className="app-sidebar__brand"
+          onClick={() => onNavClick && onNavClick('dashboard')}
+          role="button"
+          tabIndex={0}
+          style={{ cursor: 'pointer' }}
+        >
           <div className="brand-logo" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" className="brand-icon" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
@@ -29,8 +35,8 @@ export default function Sidebar({ activeNav = 'sign-speak', onNavClick }) {
         <button
           type="button"
           className="sidebar-quick-btn"
-          onClick={() => {}}
-          title="New Communication Session"
+          onClick={() => onNavClick && onNavClick('sign-speak')}
+          title="Launch Live Communication Session"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="quick-btn-icon">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -95,7 +101,12 @@ export default function Sidebar({ activeNav = 'sign-speak', onNavClick }) {
 
       <div className="app-sidebar__bottom">
         {/* System telemetry card */}
-        <div className="sidebar-telemetry">
+        <div
+          className="sidebar-telemetry"
+          onClick={() => onNavClick && onNavClick('settings')}
+          style={{ cursor: 'pointer' }}
+          title="Open Settings"
+        >
           <div className="sidebar-telemetry__header">
             <span className="sidebar-telemetry__dot" />
             <span className="sidebar-telemetry__status">ENGINES ACTIVE</span>
@@ -107,7 +118,12 @@ export default function Sidebar({ activeNav = 'sign-speak', onNavClick }) {
         </div>
 
         {/* User profile */}
-        <div className="sidebar-user">
+        <div
+          className="sidebar-user"
+          onClick={() => onNavClick && onNavClick('settings')}
+          style={{ cursor: 'pointer' }}
+          title="User Preferences"
+        >
           <div className="sidebar-user__avatar">
             <span>SV</span>
           </div>
