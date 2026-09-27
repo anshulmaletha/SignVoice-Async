@@ -26,6 +26,10 @@ export const GESTURE_MAP = Object.freeze({
   Closed_Fist: {
     gesture: 'STOP',
     text: 'Stop'
+  },
+  Pointing_Up: {
+    gesture: 'WAIT',
+    text: 'Wait'
   }
 });
 
