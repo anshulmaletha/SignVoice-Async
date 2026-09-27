@@ -121,34 +121,84 @@ export default function SignUserPanel() {
     return () => clearInterval(id)
   }, [])
 
+  function handleReplay() {
+    if (lastSpoken) {
+      speak(lastSpoken)
+    }
+  }
+
   return (
     <div className="sign-user-panel">
+      {/* Header bar above camera */}
       <div className="sign-user-panel__header">
-        <ConnectionStatusBadge isReady={isReady} />
-        <span className="panel-tag">VISION ENGINE</span>
+        <div className="vision-header-left">
+          <div className="vision-status-indicator">
+            <span className={`status-dot ${isReady ? 'status-dot--ready' : 'status-dot--loading'}`} />
+            <span className="vision-header-title">Vision Viewport</span>
+          </div>
+          <ConnectionStatusBadge isReady={isReady} />
+        </div>
+        <div className="vision-header-right">
+          <span className="panel-tag panel-tag--amber">GESTURE TRACKING</span>
+        </div>
       </div>
+
       {errorCode && <PermissionBanner type="camera" code={errorCode} />}
-      <CameraFeed videoRef={videoRef} error={errorCode} isReady={isReady} />
-      <GestureBadge gesture={current.gesture} text={current.text} />
-      <ConfidenceBar confidence={current.confidence} />
-      <div className={`sign-to-speech-result ${isSpeaking ? 'sign-to-speech-result--active' : ''}`}>
-        <span className="sign-to-speech-result__icon">
-          {isSpeaking ? '🔊' : '🔈'}
-        </span>
-        <span className="sign-to-speech-result__text">
-          {isSpeaking ? (
-            <span className="speaking-indicator">
-              Speaking
-              <span className="dot-pulse">.</span>
-              <span className="dot-pulse">.</span>
-              <span className="dot-pulse">.</span>
+
+      {/* Main Camera Viewport with Warm HUD Brackets */}
+      <CameraFeed
+        videoRef={videoRef}
+        error={errorCode}
+        isReady={isReady}
+        gestureText={current.text}
+        confidence={current.confidence}
+      />
+
+      {/* Results & Telemetry below camera */}
+      <div className="vision-results-grid">
+        <div className="vision-result-card vision-result-card--gesture">
+          <div className="vision-result-card__label">Detected Sign</div>
+          <GestureBadge gesture={current.gesture} text={current.text} />
+          <ConfidenceBar confidence={current.confidence} />
+        </div>
+
+        <div className={`vision-result-card vision-result-card--tts ${isSpeaking ? 'vision-result-card--speaking' : ''}`}>
+          <div className="vision-result-card__label-row">
+            <span className="vision-result-card__label">Spoken Output (TTS)</span>
+            {lastSpoken && (
+              <button
+                type="button"
+                className="replay-tts-btn"
+                onClick={handleReplay}
+                title="Replay spoken audio"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="replay-icon">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Replay</span>
+              </button>
+            )}
+          </div>
+          <div className="tts-output-body">
+            <span className="tts-output-icon">
+              {isSpeaking ? '🔊' : '🔈'}
             </span>
-          ) : lastSpoken ? (
-            `Last spoken: "${lastSpoken}"`
-          ) : (
-            'Waiting for a gesture…'
-          )}
-        </span>
+            <span className="tts-output-text">
+              {isSpeaking ? (
+                <span className="speaking-indicator">
+                  Synthesizing speech
+                  <span className="dot-pulse">.</span>
+                  <span className="dot-pulse">.</span>
+                  <span className="dot-pulse">.</span>
+                </span>
+              ) : lastSpoken ? (
+                <span className="last-spoken-phrase">"{lastSpoken}"</span>
+              ) : (
+                <span className="tts-placeholder">Waiting for gesture...</span>
+              )}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   )

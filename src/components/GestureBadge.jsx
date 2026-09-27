@@ -1,9 +1,11 @@
+import React from 'react'
+
 export default function GestureBadge({ gesture, text }) {
   if (gesture === 'NONE') {
     return (
       <div className="gesture-badge gesture-badge--none">
         <span className="gesture-badge__icon">👋</span>
-        <span>Show your hand</span>
+        <span className="gesture-badge__text">Show your hand</span>
       </div>
     )
   }
@@ -11,7 +13,7 @@ export default function GestureBadge({ gesture, text }) {
     return (
       <div className="gesture-badge gesture-badge--unknown">
         <span className="gesture-badge__spinner" />
-        <span>Recognizing...</span>
+        <span className="gesture-badge__text">Recognizing...</span>
       </div>
     )
   }

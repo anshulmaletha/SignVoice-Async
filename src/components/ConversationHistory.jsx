@@ -22,12 +22,13 @@ export default function ConversationHistory() {
   }, [messages])
 
   return (
-    <section className="conversation-history" aria-label="Conversation Feed">
+    <section className="conversation-history" aria-label="Live Conversation History">
       <div className="conversation-history__header">
         <div className="conversation-history__title-group">
-          <h2>Live Conversation</h2>
+          <div className="live-pulse-dot" />
+          <h2 className="conversation-history__title">Live Conversation</h2>
           <span className="conversation-history__count">
-            {messages.length} {messages.length === 1 ? 'message' : 'messages'}
+            {messages.length} {messages.length === 1 ? 'entry' : 'entries'}
           </span>
         </div>
         {messages.length > 0 && <ClearConversationButton />}
@@ -40,9 +41,13 @@ export default function ConversationHistory() {
       >
         {messages.length === 0 ? (
           <div className="conversation-history__empty">
-            <span className="conversation-history__empty-icon">💬</span>
-            <p>No messages yet.</p>
-            <small>Sign to the camera or speak into the microphone to begin.</small>
+            <div className="empty-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="empty-chat-svg">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </div>
+            <p className="empty-chat-title">Conversation Feed Idle</p>
+            <small className="empty-chat-subtitle">Sign to the camera or speak into the microphone to begin two-way communication.</small>
           </div>
         ) : (
           messages.map((m) => (

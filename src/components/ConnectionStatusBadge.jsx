@@ -1,3 +1,5 @@
+import React from 'react'
+
 export default function ConnectionStatusBadge({ isReady }) {
   return (
     <div
@@ -6,7 +8,9 @@ export default function ConnectionStatusBadge({ isReady }) {
       }`}
     >
       <span className="connection-status__dot" />
-      {isReady ? 'Camera Ready' : 'Loading model...'}
+      <span className="connection-status__text">
+        {isReady ? 'Camera Ready' : 'Loading model...'}
+      </span>
     </div>
   )
 }

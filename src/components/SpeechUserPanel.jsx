@@ -97,31 +97,51 @@ export default function SpeechUserPanel() {
   return (
     <div className="speech-user-panel">
       <div className="speech-user-panel__header">
-        <div className="speech-user-panel__controls">
+        <div className="speech-header-left">
+          <span className={`status-dot ${isListening ? (isTtsActive ? 'status-dot--muted' : 'status-dot--active') : 'status-dot--idle'}`} />
+          <span className="speech-header-title">Speech Input</span>
+        </div>
+        <span className="panel-tag panel-tag--terracotta">VOICE ENGINE</span>
+      </div>
+
+      {errorCode && <PermissionBanner type="mic" code={errorCode} />}
+
+      <div className="speech-controls-card">
+        <div className="speech-controls-row">
           <MicButton
             isListening={isListening}
             status={currentStatus}
             onToggle={toggleMic}
           />
-          {statusMessage && (
-            <span className="speech-status-pill speech-status-pill--ready">
-              ✓ {statusMessage}
-            </span>
-          )}
-          {isListening && isTtsActive && (
-            <span className="speech-status-pill speech-status-pill--muted">
-              🔇 Speaker active (echo suppressed)
-            </span>
-          )}
+          <div className="speech-status-group">
+            {statusMessage && (
+              <span className="speech-status-pill speech-status-pill--ready">
+                ✓ {statusMessage}
+              </span>
+            )}
+            {isListening && isTtsActive && (
+              <span className="speech-status-pill speech-status-pill--muted">
+                🔇 Speaker active (echo suppressed)
+              </span>
+            )}
+            {isListening && !isTtsActive && !statusMessage && (
+              <span className="speech-status-pill speech-status-pill--active">
+                ● Listening in real-time
+              </span>
+            )}
+          </div>
         </div>
-        <span className="panel-tag">SPEECH ENGINE</span>
+
+        {/* Live caption area */}
+        <div className="speech-caption-container">
+          <div className="speech-caption-label">Real-Time Transcription</div>
+          <LiveCaption
+            text={caption.text}
+            isFinal={caption.isFinal}
+            isListening={isListening && !isTtsActive}
+          />
+        </div>
       </div>
-      {errorCode && <PermissionBanner type="mic" code={errorCode} />}
-      <LiveCaption
-        text={caption.text}
-        isFinal={caption.isFinal}
-        isListening={isListening && !isTtsActive}
-      />
     </div>
   )
 }

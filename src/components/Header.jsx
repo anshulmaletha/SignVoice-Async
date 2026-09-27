@@ -1,14 +1,26 @@
+import React from 'react'
+
 export default function Header() {
   return (
-    <header className="app-header">
-      <div className="app-header__badge">
-        <span className="app-header__badge-dot" />
-        <span>Real-Time Multimodal AI</span>
+    <header className="app-topbar">
+      <div className="topbar-left">
+        <div className="topbar-session-badge">
+          <span className="topbar-live-dot" />
+          <span className="topbar-session-title">LIVE SESSION</span>
+        </div>
+        <div className="topbar-divider" />
+        <h1 className="topbar-heading">SignVoice Real-Time Communication</h1>
       </div>
-      <h1>SignVoice</h1>
-      <p className="app-header__tagline">
-        Two-way sign language and speech communication, in real time.
-      </p>
+      <div className="topbar-right">
+        <div className="topbar-metric">
+          <span className="topbar-metric-label">STATUS</span>
+          <span className="topbar-metric-value topbar-metric-value--live">ONLINE</span>
+        </div>
+        <div className="topbar-metric">
+          <span className="topbar-metric-label">MODE</span>
+          <span className="topbar-metric-value">TWO-WAY DUPLEX</span>
+        </div>
+      </div>
     </header>
   )
 }
