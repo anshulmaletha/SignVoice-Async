@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { getSessions, subscribeSessions } from '../services/sessionStore.js'
 import { getFriendsData, subscribeFriends } from '../services/friendStore.js'
 import { getMessages } from '../services/conversationStore.js'
+import Aurora from '../components/Aurora.jsx'
 
 export default function DashboardView({ onNavigate }) {
   const [sessions, setSessions] = useState(getSessions())
@@ -25,8 +26,14 @@ export default function DashboardView({ onNavigate }) {
 
   return (
     <div className="view-container dashboard-view">
-      {/* Hero Welcome Banner */}
+      {/* Hero Welcome Banner with Aurora WebGL Shader Background */}
       <div className="dashboard-hero">
+        <Aurora
+          colorStops={["#DDD0C8", "#323232", "#8FA68A"]}
+          blend={0.5}
+          amplitude={0.8}
+          speed={0.4}
+        />
         <div className="dashboard-hero__content">
           <div className="dashboard-hero__badge">
             <span className="hero-dot" />
