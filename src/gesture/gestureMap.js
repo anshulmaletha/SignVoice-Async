@@ -1,5 +1,5 @@
 /**
- * Frozen SignVoice 5-Gesture Mapping Dictionary
+ * Frozen SignVoice Gesture Mapping Dictionary
  * Maps MediaPipe raw category names to SignVoice GESTURE_OUTPUT format.
  */
 export const GESTURE_MAP = Object.freeze({
@@ -26,6 +26,10 @@ export const GESTURE_MAP = Object.freeze({
   Closed_Fist: {
     gesture: 'STOP',
     text: 'Stop'
+  },
+  Pointing_Up: {
+    gesture: 'WAIT',
+    text: 'Wait'
   }
 });
 
@@ -70,7 +74,7 @@ export function mapGesture(categoryName, score = 0, timestamp = new Date().toLoc
     };
   }
 
-  // Check if category exists in frozen 5-gesture dictionary
+  // Check if category exists in frozen gesture dictionary
   const matched = GESTURE_MAP[categoryName];
   if (matched) {
     return {

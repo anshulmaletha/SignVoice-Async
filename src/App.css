@@ -1,0 +1,259 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: #0f1115;
+  color: #e8e8e8;
+}
+
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px 24px 48px;
+}
+
+.app-header {
+  text-align: center;
+  padding: 16px 0 24px;
+  border-bottom: 1px solid #2a2d34;
+  margin-bottom: 24px;
+}
+
+.app-header h1 {
+  margin: 0 0 4px;
+  font-size: 2rem;
+  color: #7dd3fc;
+}
+
+.app-header__tagline {
+  margin: 0;
+  color: #9aa0aa;
+  font-size: 0.95rem;
+}
+
+.app__panels {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.sign-user-panel,
+.speech-user-panel {
+  flex: 1;
+  min-width: 320px;
+  background: #171a21;
+  border: 1px solid #2a2d34;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.camera-feed {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #000;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.camera-feed--unavailable {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #2a2d34;
+  border-radius: 8px;
+}
+
+.connection-status {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.connection-status--loading {
+  background: #4b3f14;
+  color: #fbbf24;
+}
+
+.connection-status--ready {
+  background: #14432b;
+  color: #4ade80;
+}
+
+.permission-banner {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: #4a1d24;
+  color: #fca5a5;
+  border: 1px solid #7f1d2b;
+}
+
+.gesture-badge {
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  background: #1e293b;
+}
+
+.gesture-badge--none {
+  color: #9aa0aa;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.gesture-badge--unknown {
+  color: #fbbf24;
+}
+
+.gesture-badge--active {
+  color: #7dd3fc;
+}
+
+.confidence-bar {
+  width: 100%;
+  height: 10px;
+  background: #2a2d34;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.confidence-bar__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #22d3ee);
+  transition: width 0.2s ease;
+}
+
+.sign-to-speech-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #9aa0aa;
+}
+
+.mic-button {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: none;
+  background: #1e293b;
+  color: #e8e8e8;
+  font-size: 1rem;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.mic-button--listening {
+  background: #7f1d2b;
+  color: #fca5a5;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(248, 113, 113, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(248, 113, 113, 0);
+  }
+}
+
+.live-caption {
+  min-height: 1.5em;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #1e293b;
+  font-size: 1rem;
+}
+
+.live-caption--empty {
+  color: #9aa0aa;
+  font-style: italic;
+}
+
+.live-caption--interim {
+  color: #9aa0aa;
+}
+
+.live-caption--final {
+  color: #e8e8e8;
+}
+
+.conversation-history {
+  background: #171a21;
+  border: 1px solid #2a2d34;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.conversation-history__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.conversation-history__header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.conversation-history__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.conversation-history__empty {
+  color: #9aa0aa;
+  font-style: italic;
+}
+
+.conversation-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  max-width: 80%;
+}
+
+.conversation-message--sign {
+  background: #1e293b;
+  align-self: flex-start;
+}
+
+.conversation-message--speech {
+  background: #1e3a2e;
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.clear-conversation-button {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #2a2d34;
+  background: transparent;
+  color: #9aa0aa;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.clear-conversation-button:hover {
+  border-color: #7dd3fc;
+  color: #7dd3fc;
+}
