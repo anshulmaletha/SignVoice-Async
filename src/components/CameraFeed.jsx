@@ -11,7 +11,7 @@ export default function CameraFeed({ videoRef, error, isReady, gestureText, conf
           </svg>
         </div>
         <div className="camera-feed__unavailable-title">Camera Feed Offline</div>
-        <div className="camera-feed__unavailable-text">Check browser permissions to enable real-time gesture input.</div>
+        <div className="camera-feed__unavailable-text">Enable camera access in your browser to start sign language gesture input.</div>
       </div>
     )
   }
@@ -26,33 +26,25 @@ export default function CameraFeed({ videoRef, error, isReady, gestureText, conf
         className={`camera-feed ${isReady ? 'camera-feed--active' : ''}`}
       />
 
-      {/* Warm Golden HUD Overlay */}
-      <div className="camera-hud" aria-hidden="true">
-        <span className="camera-hud__corner camera-hud__corner--tl" />
-        <span className="camera-hud__corner camera-hud__corner--tr" />
-        <span className="camera-hud__corner camera-hud__corner--bl" />
-        <span className="camera-hud__corner camera-hud__corner--br" />
-        
-        {isReady && <div className="camera-hud__scanline" />}
-
-        {/* HUD Status Overlay Badges */}
-        <div className="camera-hud__overlay-top">
-          <span className={`hud-badge ${isReady ? 'hud-badge--live' : 'hud-badge--standby'}`}>
-            <span className="hud-badge__dot" />
-            {isReady ? 'LIVE TRACKING' : 'INITIALIZING'}
+      {/* Clean minimal camera framing overlay */}
+      <div className="camera-overlay-container">
+        <div className="camera-overlay-top">
+          <span className={`camera-status-pill ${isReady ? 'camera-status-pill--live' : 'camera-status-pill--standby'}`}>
+            <span className="camera-status-dot" />
+            {isReady ? 'LIVE' : 'INITIALIZING'}
           </span>
-          <span className="hud-badge hud-badge--mode">
-            OPTICAL FEED
+          <span className="camera-mode-pill">
+            {isReady ? 'Camera Ready' : 'Loading Model'}
           </span>
         </div>
 
         {isReady && gestureText && (
-          <div className="camera-hud__overlay-bottom">
-            <div className="hud-gesture-pill">
-              <span className="hud-gesture-pill__icon">👁️</span>
-              <span className="hud-gesture-pill__text">{gestureText}</span>
+          <div className="camera-overlay-bottom">
+            <div className="camera-gesture-pill">
+              <span className="camera-gesture-label">Detected Sign:</span>
+              <span className="camera-gesture-val">{gestureText}</span>
               {confidence > 0 && (
-                <span className="hud-gesture-pill__conf">{Math.round(confidence * 100)}%</span>
+                <span className="camera-gesture-conf">{Math.round(confidence * 100)}%</span>
               )}
             </div>
           </div>

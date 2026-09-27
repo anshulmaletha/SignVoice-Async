@@ -29,21 +29,21 @@ export default function DashboardView({ onNavigate }) {
       {/* Hero Welcome Banner with Aurora WebGL Shader Background */}
       <div className="dashboard-hero">
         <Aurora
-          colorStops={["#DDD0C8", "#323232", "#8FA68A"]}
-          blend={0.5}
-          amplitude={0.8}
-          speed={0.4}
+          colorStops={["#DDD0C8", "#8C7B70", "#F3EEE8"]}
+          blend={0.6}
+          amplitude={0.7}
+          speed={0.35}
         />
         <div className="dashboard-hero__content">
           <div className="dashboard-hero__badge">
             <span className="hero-dot" />
-            <span>Real-Time Two-Way Communication</span>
+            <span>Multimodal Communication AI</span>
           </div>
           <h2 className="dashboard-hero__title">
-            Sign Language <span className="text-amber">meets</span> Voice Speech
+            Good morning, Anshul.
           </h2>
           <p className="dashboard-hero__desc">
-            Bridge the gap instantly. Use your webcam for optical gesture tracking and microphone for speech synthesis in simultaneous duplex mode.
+            Communicate naturally. Sign, speak, and connect seamlessly with real-time gesture recognition and voice synthesis.
           </p>
           <div className="dashboard-hero__actions">
             <button
@@ -51,17 +51,17 @@ export default function DashboardView({ onNavigate }) {
               className="btn-primary-glow"
               onClick={() => onNavigate('sign-speak')}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="btn-icon">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
-              <span>Start Communication Session</span>
+              <span>Start Communication</span>
             </button>
             <button
               type="button"
               className="btn-secondary"
               onClick={() => onNavigate('sessions')}
             >
-              <span>View Past Transcripts</span>
+              <span>View Past Sessions</span>
             </button>
           </div>
         </div>
@@ -72,20 +72,20 @@ export default function DashboardView({ onNavigate }) {
         <div className="metric-card" onClick={() => onNavigate('sign-speak')} role="button" tabIndex={0}>
           <div className="metric-card__header">
             <span className="metric-card__label">Active Workspace</span>
-            <span className="metric-card__icon text-amber">👁️</span>
+            <span className="metric-card__icon">👁️</span>
           </div>
           <div className="metric-card__value">
             {liveMsgCount > 0 ? `${liveMsgCount} Messages` : 'Standby'}
           </div>
           <div className="metric-card__sub">
-            {liveMsgCount > 0 ? 'Live communication active' : 'Click to launch camera & mic'}
+            {liveMsgCount > 0 ? 'Live session in progress' : 'Ready to start camera & mic'}
           </div>
         </div>
 
         <div className="metric-card" onClick={() => onNavigate('sessions')} role="button" tabIndex={0}>
           <div className="metric-card__header">
             <span className="metric-card__label">Saved Sessions</span>
-            <span className="metric-card__icon text-terracotta">📁</span>
+            <span className="metric-card__icon">📁</span>
           </div>
           <div className="metric-card__value">{sessions.length}</div>
           <div className="metric-card__sub">Archived conversation transcripts</div>
@@ -93,11 +93,11 @@ export default function DashboardView({ onNavigate }) {
 
         <div className="metric-card" onClick={() => onNavigate('friends')} role="button" tabIndex={0}>
           <div className="metric-card__header">
-            <span className="metric-card__label">Connected Friends</span>
-            <span className="metric-card__icon text-success">👥</span>
+            <span className="metric-card__label">Friends Directory</span>
+            <span className="metric-card__icon">👥</span>
           </div>
           <div className="metric-card__value">{onlineFriends.length} Online</div>
-          <div className="metric-card__sub">{friendsData.friends.length} contacts available</div>
+          <div className="metric-card__sub">{friendsData.friends.length} total contacts</div>
         </div>
       </div>
 
@@ -115,7 +115,7 @@ export default function DashboardView({ onNavigate }) {
               className="dash-link-btn"
               onClick={() => onNavigate('sessions')}
             >
-              See All →
+              View All →
             </button>
           </div>
           <div className="dash-sessions-list">
@@ -133,7 +133,7 @@ export default function DashboardView({ onNavigate }) {
                     {new Date(sess.startedAt).toLocaleDateString()} • {sess.messageCount} messages
                   </span>
                 </div>
-                <span className="dash-session-badge">View Transcript</span>
+                <span className="dash-session-badge">Inspect</span>
               </div>
             ))}
           </div>
@@ -151,7 +151,7 @@ export default function DashboardView({ onNavigate }) {
               className="dash-link-btn"
               onClick={() => onNavigate('friends')}
             >
-              Manage →
+              Directory →
             </button>
           </div>
           <div className="dash-friends-list">
