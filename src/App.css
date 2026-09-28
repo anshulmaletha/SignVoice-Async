@@ -1188,7 +1188,7 @@ html, body {
 
 /* Voice Speech Message Card */
 .conversation-message--speech {
-  background-color: #ffffff;
+  background-color: var(--bg-card-alt);
   border: 1px solid var(--border-color);
   border-left: 4px solid var(--border-color);
 }
@@ -2957,6 +2957,35 @@ html.dark .status-badge-dot {
 html.dark .profile-role-pill,
 html.dark .dash-session-badge {
   background-color: rgba(169, 137, 119, 0.25);
+  color: #F1E7DD;
+}
+
+/* Dark Mode Conversation Message Cards */
+html.dark .conversation-message--sign {
+  background-color: rgba(42, 36, 32, 0.88);
+  border: 1px solid rgba(241, 231, 221, 0.12);
+  border-left: 4px solid #A98977;
+}
+
+html.dark .conversation-message--sign .conversation-message__sender {
+  color: #F4C79A;
+}
+
+html.dark .conversation-message--speech {
+  background-color: rgba(28, 24, 21, 0.85);
+  border: 1px solid rgba(241, 231, 221, 0.08);
+  border-left: 4px solid rgba(241, 231, 221, 0.2);
+}
+
+html.dark .conversation-message--speech .conversation-message__sender {
+  color: #CDBFB2;
+}
+
+html.dark .conversation-message__time {
+  color: #CDBFB2;
+}
+
+html.dark .conversation-message__text {
   color: #F1E7DD;
 }
 
