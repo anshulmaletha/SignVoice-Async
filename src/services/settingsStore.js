@@ -1,7 +1,7 @@
 const STORAGE_KEY = 'signvoice_settings_v1'
 
 const defaultSettings = {
-  darkMode: false,
+  darkMode: true,
   selectedCameraId: '',
   selectedMicId: '',
   ttsRate: 1.0,

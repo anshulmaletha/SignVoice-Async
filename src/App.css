@@ -2800,56 +2800,88 @@ html, body {
 }
 
 /* ==========================================================================
-   Dark Theme System (Persisted Light / Dark Switching)
+   Dark Theme System (Landing Page Espresso Palette Integration)
+   Target Palette:
+   - Hero Background: Radial/Linear Gradient (#3A312C -> #2A2420)
+   - Primary Text: #F1E7DD (Cream)
+   - Secondary / Muted Text: #CDBFB2
+   - Accent Buttons: #A98977 (Rose-Taupe), Hover: #967665
+   - Panels / Cards: rgba(42, 36, 32, 0.88) with 1px solid rgba(241, 231, 221, 0.12)
+   - Inset Fields / Sub-panels: rgba(28, 24, 21, 0.85)
+   - Status Chips & Badges: #9BC294 (Green), #F4C79A (Amber)
    ========================================================================== */
 
 html.dark, body.dark-mode {
-  --bg-app: #181615;
-  --bg-topbar: #23201e;
-  --bg-card: #282523;
-  --bg-card-alt: #22201e;
-  --bg-input: #282523;
-  --text-dark: #f5f2ee;
-  --text-muted: #b5aba4;
-  --charcoal-dark: #f5f2ee;
-  --taupe-primary: #b8a79b;
-  --taupe-muted: #9e9188;
-  --beige-accent: #3d3632;
-  --cream-light: #272422;
-  --off-white: #1e1c1b;
-  --border-color: #3e3834;
-  --shadow-subtle: 0 2px 10px rgba(0, 0, 0, 0.3);
-  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --bg-app-start: #3A312C;
+  --bg-app-end: #2A2420;
+  --bg-app: #2A2420;
+  --bg-topbar: rgba(58, 49, 44, 0.92);
+  --bg-card: rgba(42, 36, 32, 0.88);
+  --bg-card-alt: rgba(32, 27, 24, 0.85);
+  --bg-input: rgba(28, 24, 21, 0.9);
+  
+  --text-dark: #F1E7DD;
+  --text-muted: #CDBFB2;
+  --charcoal-dark: #F1E7DD;
+  
+  --taupe-primary: #A98977;
+  --taupe-muted: #CDBFB2;
+  --beige-accent: #A98977;
+  --cream-light: rgba(42, 36, 32, 0.88);
+  --off-white: #2A2420;
+  
+  --border-color: rgba(241, 231, 221, 0.12);
+  --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-card: 0 12px 28px rgba(0, 0, 0, 0.35);
+  
+  --btn-rose-taupe: #A98977;
+  --btn-rose-taupe-hover: #967665;
+  --glow-accent: #F4C79A;
 }
 
-html.dark body {
-  background-color: var(--bg-app);
-  color: var(--text-dark);
+html.dark body,
+html.dark .app-container {
+  background: radial-gradient(ellipse at 85% 15%, rgba(244, 199, 154, 0.14) 0%, transparent 65%),
+              linear-gradient(135deg, #3A312C 0%, #2A2420 100%);
+  background-attachment: fixed;
+  color: #F1E7DD;
 }
 
 html.dark .top-navbar {
-  background-color: var(--bg-app);
-  border-bottom-color: rgba(62, 56, 52, 0.6);
+  background: rgba(58, 49, 44, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(241, 231, 221, 0.08);
 }
 
 html.dark .topnav-menu {
-  background-color: #272422;
-  border-color: #3e3834;
+  background: rgba(42, 36, 32, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(241, 231, 221, 0.12);
+  border-radius: 999px;
 }
 
 html.dark .topnav-link {
-  color: var(--text-dark);
+  color: #CDBFB2;
 }
 
-html.dark .animated-bg-pill--active {
-  background-color: #3d3632;
-  border-color: rgba(184, 167, 155, 0.3);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+html.dark .topnav-link:hover {
+  color: #F1E7DD;
+  background-color: rgba(241, 231, 221, 0.08);
+}
+
+html.dark .animated-bg-pill--active,
+html.dark .topnav-link--active {
+  background-color: #A98977;
+  color: #F1E7DD;
+  border-color: rgba(244, 199, 154, 0.25);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 html.dark .animated-bg-pill--hover {
-  background-color: rgba(61, 54, 50, 0.6);
-  border-color: rgba(184, 167, 155, 0.2);
+  background-color: rgba(241, 231, 221, 0.08);
+  border-color: rgba(241, 231, 221, 0.12);
 }
 
 html.dark .sign-user-panel,
@@ -2859,37 +2891,104 @@ html.dark .dash-card,
 html.dark .metric-card,
 html.dark .settings-card,
 html.dark .profile-card,
-html.dark .friend-card {
-  background-color: var(--bg-card);
-  border-color: var(--border-color);
+html.dark .friend-card,
+html.dark .workspace-view {
+  background: rgba(42, 36, 32, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(241, 231, 221, 0.12);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  border-radius: 14px;
 }
 
 html.dark .vision-result-card,
 html.dark .dash-session-row,
 html.dark .dash-friend-row,
 html.dark .tts-output-body,
+html.dark .speech-card,
+html.dark .conversation-feed,
+html.dark .form-select,
+html.dark .form-input,
 html.dark .gesture-badge--none,
 html.dark .gesture-badge--unknown,
 html.dark .gesture-badge--active {
-  background-color: #22201e;
-  border-color: var(--border-color);
-  color: var(--text-dark);
+  background-color: rgba(28, 24, 21, 0.85);
+  border: 1px solid rgba(241, 231, 221, 0.08);
+  color: #F1E7DD;
 }
 
+html.dark .camera-viewport--offline,
 html.dark .camera-feed--unavailable {
-  background-color: #22201e;
-  border-color: #3e3834;
+  background-color: rgba(24, 21, 18, 0.95);
+  border: 1px solid rgba(241, 231, 221, 0.12);
+  color: #F1E7DD;
 }
 
 html.dark .btn-camera-toggle--off {
-  background: rgba(39, 36, 34, 0.92);
-  color: var(--text-dark);
-  border-color: var(--border-color);
+  background: rgba(42, 36, 32, 0.92);
+  color: #F1E7DD;
+  border: 1px solid rgba(241, 231, 221, 0.14);
 }
 
-html.dark .form-select,
-html.dark .form-input {
-  background-color: #22201e;
-  border-color: #3e3834;
-  color: var(--text-dark);
+html.dark .btn-camera-toggle--on,
+html.dark .btn-start-mic,
+html.dark .btn-primary {
+  background-color: #A98977;
+  color: #F1E7DD;
+  border-color: transparent;
+}
+
+html.dark .btn-camera-toggle--on:hover,
+html.dark .btn-start-mic:hover,
+html.dark .btn-primary:hover {
+  background-color: #967665;
+}
+
+html.dark .topnav-profile-pill,
+html.dark .topnav-status {
+  background: rgba(42, 36, 32, 0.88);
+  border: 1px solid rgba(241, 231, 221, 0.12);
+  color: #F1E7DD;
+}
+
+html.dark .camera-status-pill--live {
+  background: rgba(127, 154, 120, 0.22);
+  color: #9BC294;
+  border: 1px solid rgba(127, 154, 120, 0.35);
+}
+
+html.dark .camera-status-pill--standby {
+  background: rgba(244, 199, 154, 0.18);
+  color: #F4C79A;
+  border: 1px solid rgba(244, 199, 154, 0.3);
+}
+
+html.dark .conversation-idle,
+html.dark .chat-empty-state {
+  color: #CDBFB2;
+}
+
+html.dark .conversation-idle svg,
+html.dark .chat-empty-state svg {
+  stroke: #A98977;
+}
+
+html.dark .msg-bubble,
+html.dark .msg-item {
+  background: rgba(38, 32, 28, 0.9);
+  border: 1px solid rgba(241, 231, 221, 0.08);
+  color: #F1E7DD;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: rgba(42, 36, 32, 0.5);
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(169, 137, 119, 0.5);
+  border-radius: 999px;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(169, 137, 119, 0.8);
 }
