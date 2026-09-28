@@ -102,43 +102,53 @@ html, body {
    Horizontal Top Navigation Bar (Nova Inspired)
    ========================================================================== */
 
+/* ==========================================================================
+   Horizontal Top Navigation Bar (Floating Capsule Style)
+   ========================================================================== */
+
 .top-navbar {
-  height: 64px;
-  background-color: var(--bg-topbar);
-  border-bottom: 1px solid var(--border-color);
+  height: 76px;
+  background-color: var(--bg-app);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px;
+  padding: 12px 36px;
   flex-shrink: 0;
-  box-shadow: var(--shadow-subtle);
   user-select: none;
-  z-index: 10;
+  z-index: 100;
+  border-bottom: 1px solid rgba(210, 200, 193, 0.4);
 }
 
 /* LEFT: Brand Header */
 .topnav-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.topnav-brand:hover {
+  opacity: 0.9;
 }
 
 .topnav-logo {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   background-color: var(--beige-accent);
+  border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--charcoal-dark);
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(50, 50, 50, 0.05);
 }
 
 .topnav-logo-icon {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   color: var(--charcoal-dark);
 }
 
@@ -149,7 +159,7 @@ html, body {
 
 .topnav-brand-name {
   font-family: var(--font-display);
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--charcoal-dark);
@@ -157,18 +167,23 @@ html, body {
 }
 
 .topnav-brand-sub {
-  font-size: 0.6rem;
+  font-size: 0.62rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   color: var(--taupe-muted);
   text-transform: uppercase;
 }
 
-/* CENTER: Horizontal Navigation Menu */
+/* CENTER: Floating Rounded Capsule Menu */
 .topnav-menu {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  background-color: var(--bg-card); /* warm cream #f3eee8 */
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill);
+  padding: 5px 8px;
+  box-shadow: 0 4px 20px rgba(50, 50, 50, 0.06), 0 1px 4px rgba(0, 0, 0, 0.03);
 }
 
 .topnav-link {
@@ -184,21 +199,22 @@ html, body {
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
 }
 
 .topnav-link:hover {
-  background-color: var(--beige-bg);
+  background-color: rgba(221, 208, 200, 0.45);
   color: var(--charcoal-dark);
 }
 
 /* Active Nav Item: Soft Beige #DDD0C8 pill background with #323232 text */
 .topnav-link--active {
   background-color: var(--beige-accent);
-  border-color: var(--border-color);
+  border-color: rgba(140, 123, 112, 0.25);
   color: var(--charcoal-dark);
   font-weight: 700;
-  box-shadow: var(--shadow-subtle);
+  box-shadow: 0 2px 8px rgba(50, 50, 50, 0.08);
 }
 
 .topnav-link-icon {
@@ -215,29 +231,56 @@ html, body {
   height: 18px;
 }
 
-/* RIGHT: Online Status & Profile Pill */
+/* RIGHT: Theme Button, Online Status & Profile Pill */
 .topnav-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+}
+
+.topnav-icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(50, 50, 50, 0.04);
+}
+
+.topnav-icon-btn:hover {
+  background-color: var(--beige-accent);
+  color: var(--charcoal-dark);
+  transform: translateY(-1px);
+}
+
+.topnav-btn-icon {
+  width: 18px;
+  height: 18px;
 }
 
 .topnav-status {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.76rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  color: var(--text-muted);
-  background: var(--cream-light);
-  padding: 4px 12px;
+  color: var(--text-dark);
+  background: var(--bg-card);
+  padding: 6px 14px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border-color);
+  box-shadow: 0 2px 6px rgba(50, 50, 50, 0.04);
 }
 
 .topnav-status-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background-color: var(--success-green);
 }
@@ -247,24 +290,26 @@ html, body {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  padding: 4px 10px 4px 6px;
+  padding: 4px 12px 4px 6px;
   border-radius: var(--radius-pill);
-  background: var(--cream-light);
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
-  transition: background 0.15s;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(50, 50, 50, 0.04);
 }
 
 .topnav-profile-pill:hover {
   background-color: var(--beige-accent);
+  transform: translateY(-1px);
 }
 
 .topnav-avatar {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background-color: var(--taupe-primary);
   color: #ffffff;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -272,7 +317,7 @@ html, body {
 }
 
 .topnav-username {
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-dark);
 }

@@ -11,7 +11,7 @@ import ProfileView from './views/ProfileView.jsx'
 import SettingsView from './views/SettingsView.jsx'
 
 export default function App() {
-  const [activeNav, setActiveNav] = useState('sign-speak')
+  const [activeNav, setActiveNav] = useState('dashboard')
 
   return (
     <div className="app-container">

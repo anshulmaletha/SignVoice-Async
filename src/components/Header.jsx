@@ -1,19 +1,30 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-export default function Header({ activeNav = 'sign-speak', onNavigate }) {
+export default function Header({ activeNav = 'dashboard', onNavigate }) {
+  const [isDarkMode, setIsDarkMode] = useState(false)
+
   const navItems = [
-    { id: 'sign-speak', label: 'Sign & Speak', icon: 'camera' },
     { id: 'dashboard', label: 'Dashboard', icon: 'grid' },
+    { id: 'sign-speak', label: 'Sign & Speak', icon: 'camera' },
     { id: 'sessions', label: 'Sessions', icon: 'clock' },
     { id: 'friends', label: 'Friends', icon: 'users' },
     { id: 'profile', label: 'Profile', icon: 'user' },
     { id: 'settings', label: 'Settings', icon: 'settings' },
   ]
 
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode)
+  }
+
   return (
     <header className="top-navbar" aria-label="Top Navigation Bar">
       {/* LEFT: Brand Header */}
-      <div className="topnav-brand" onClick={() => onNavigate && onNavigate('dashboard')} role="button" tabIndex={0}>
+      <div
+        className="topnav-brand"
+        onClick={() => onNavigate && onNavigate('dashboard')}
+        role="button"
+        tabIndex={0}
+      >
         <div className="topnav-logo" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="topnav-logo-icon">
             <path strokeLinecap="round" strokeLinejoin="round" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
@@ -25,8 +36,8 @@ export default function Header({ activeNav = 'sign-speak', onNavigate }) {
         </div>
       </div>
 
-      {/* CENTER: Horizontal Navigation Bar */}
-      <nav className="topnav-menu">
+      {/* CENTER: Horizontal Floating Navigation Capsule */}
+      <nav className="topnav-menu" aria-label="Main Floating Navigation">
         {navItems.map((item) => {
           const isActive = item.id === activeNav
           return (
@@ -37,17 +48,17 @@ export default function Header({ activeNav = 'sign-speak', onNavigate }) {
               onClick={() => onNavigate && onNavigate(item.id)}
             >
               <span className="topnav-link-icon" aria-hidden="true">
-                {item.icon === 'camera' && (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                )}
                 {item.icon === 'grid' && (
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="3" y="3" width="7" height="7" rx="1.5" />
                     <rect x="14" y="3" width="7" height="7" rx="1.5" />
                     <rect x="14" y="14" width="7" height="7" rx="1.5" />
                     <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                  </svg>
+                )}
+                {item.icon === 'camera' && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
                 )}
                 {item.icon === 'clock' && (
@@ -79,12 +90,39 @@ export default function Header({ activeNav = 'sign-speak', onNavigate }) {
         })}
       </nav>
 
-      {/* RIGHT: Status & User Profile */}
+      {/* RIGHT: Theme Toggle, Online Status & Profile Pill */}
       <div className="topnav-right">
+        <button
+          type="button"
+          className="topnav-icon-btn"
+          onClick={toggleTheme}
+          title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          aria-label="Toggle Theme"
+        >
+          {isDarkMode ? (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="topnav-btn-icon">
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="topnav-btn-icon">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          )}
+        </button>
+
         <div className="topnav-status">
           <span className="topnav-status-dot" />
           <span className="topnav-status-text">Online</span>
         </div>
+
         <div
           className="topnav-profile-pill"
           onClick={() => onNavigate && onNavigate('profile')}
