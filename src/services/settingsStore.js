@@ -1,6 +1,7 @@
 const STORAGE_KEY = 'signvoice_settings_v1'
 
 const defaultSettings = {
+  darkMode: false,
   selectedCameraId: '',
   selectedMicId: '',
   ttsRate: 1.0,
@@ -14,14 +15,29 @@ const defaultSettings = {
   echoGuard: true,
 }
 
+export function applyTheme(isDark) {
+  if (typeof document !== 'undefined') {
+    if (isDark) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }
+}
+
 function getInitialSettings() {
   if (typeof window === 'undefined') return defaultSettings
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return { ...defaultSettings, ...JSON.parse(raw) }
+    if (raw) {
+      const parsed = { ...defaultSettings, ...JSON.parse(raw) }
+      applyTheme(parsed.darkMode)
+      return parsed
+    }
   } catch (e) {
     console.warn('Failed to read settings from localStorage', e)
   }
+  applyTheme(defaultSettings.darkMode)
   return defaultSettings
 }
 
@@ -36,6 +52,7 @@ function persist() {
       console.warn('Failed to save settings to localStorage', e)
     }
   }
+  applyTheme(settings.darkMode)
   listeners.forEach((fn) => fn(settings))
 }
 

@@ -3,6 +3,7 @@ import { getSessions, subscribeSessions } from '../services/sessionStore.js'
 import { getFriendsData, subscribeFriends } from '../services/friendStore.js'
 import { getMessages } from '../services/conversationStore.js'
 import Aurora from '../components/Aurora.jsx'
+import { GlowActionButton } from '../components/GlowEffect.jsx'
 
 export default function DashboardView({ onNavigate }) {
   const [sessions, setSessions] = useState(getSessions())
@@ -46,16 +47,18 @@ export default function DashboardView({ onNavigate }) {
             Communicate naturally. Sign, speak, and connect seamlessly with real-time gesture recognition and voice synthesis.
           </p>
           <div className="dashboard-hero__actions">
-            <button
-              type="button"
-              className="btn-primary-glow"
+            <GlowActionButton
+              variant="primary"
               onClick={() => onNavigate('sign-speak')}
+              icon={
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="btn-icon">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              }
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="btn-icon">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              <span>Start Communication</span>
-            </button>
+              Start Communication
+            </GlowActionButton>
+            
             <button
               type="button"
               className="btn-secondary"
