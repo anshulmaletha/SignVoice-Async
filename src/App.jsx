@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './App.css'
 import LandingPage from './components/LandingPage.jsx'
+import LoginView from './views/LoginView.jsx'
 import Header from './components/Header.jsx'
 import SignUserPanel from './components/SignUserPanel.jsx'
 import SpeechUserPanel from './components/SpeechUserPanel.jsx'
@@ -12,16 +13,85 @@ import ProfileView from './views/ProfileView.jsx'
 import SettingsView from './views/SettingsView.jsx'
 
 export default function App() {
-  const [view, setView] = useState('landing')
+  const [view, setView] = useState(() => {
+    const path = window.location.pathname
+    const isAuth = sessionStorage.getItem('signvoice_auth') === 'true'
+    if (path === '/app') {
+      return isAuth ? 'app' : 'login'
+    }
+    if (path === '/login') {
+      return 'login'
+    }
+    return 'landing'
+  })
+
   const [activeNav, setActiveNav] = useState('sign-speak')
 
-  if (view === 'landing') {
-    return (
-      <LandingPage
-        onGetStarted={() => {
+  // Handle browser back/forward button navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname
+      const isAuth = sessionStorage.getItem('signvoice_auth') === 'true'
+
+      if (path === '/app') {
+        if (isAuth) {
           setView('app')
-          setActiveNav('sign-speak')
-        }}
+        } else {
+          setView('login')
+          window.history.replaceState(null, '', '/login')
+        }
+      } else if (path === '/login') {
+        setView('login')
+      } else {
+        setView('landing')
+      }
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
+  const navigateTo = (targetView, path) => {
+    setView(targetView)
+    if (path && window.location.pathname !== path) {
+      window.history.pushState(null, '', path)
+    }
+  }
+
+  const handleGetStarted = () => {
+    const isAuth = sessionStorage.getItem('signvoice_auth') === 'true'
+    if (isAuth) {
+      navigateTo('app', '/app')
+      setActiveNav('sign-speak')
+    } else {
+      navigateTo('login', '/login')
+    }
+  }
+
+  const handleLoginSuccess = () => {
+    sessionStorage.setItem('signvoice_auth', 'true')
+    navigateTo('app', '/app')
+    setActiveNav('sign-speak')
+  }
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('signvoice_auth')
+    navigateTo('login', '/login')
+  }
+
+  const handleNavigateLanding = () => {
+    navigateTo('landing', '/')
+  }
+
+  if (view === 'landing') {
+    return <LandingPage onGetStarted={handleGetStarted} />
+  }
+
+  if (view === 'login') {
+    return (
+      <LoginView
+        onLoginSuccess={handleLoginSuccess}
+        onBackToLanding={handleNavigateLanding}
       />
     )
   }
@@ -32,7 +102,8 @@ export default function App() {
       <Header
         activeNav={activeNav}
         onNavigate={setActiveNav}
-        onNavigateLanding={() => setView('landing')}
+        onNavigateLanding={handleNavigateLanding}
+        onLogout={handleLogout}
       />
 
       {/* 2. Main Workspace Content Area below Topbar */}
