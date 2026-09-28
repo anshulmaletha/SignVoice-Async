@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import './App.css'
+import LandingPage from './components/LandingPage.jsx'
 import Header from './components/Header.jsx'
 import SignUserPanel from './components/SignUserPanel.jsx'
 import SpeechUserPanel from './components/SpeechUserPanel.jsx'
@@ -11,12 +12,28 @@ import ProfileView from './views/ProfileView.jsx'
 import SettingsView from './views/SettingsView.jsx'
 
 export default function App() {
-  const [activeNav, setActiveNav] = useState('dashboard')
+  const [view, setView] = useState('landing')
+  const [activeNav, setActiveNav] = useState('sign-speak')
+
+  if (view === 'landing') {
+    return (
+      <LandingPage
+        onGetStarted={() => {
+          setView('app')
+          setActiveNav('sign-speak')
+        }}
+      />
+    )
+  }
 
   return (
     <div className="app-container">
       {/* 1. Horizontal Top Navigation Bar */}
-      <Header activeNav={activeNav} onNavigate={setActiveNav} />
+      <Header
+        activeNav={activeNav}
+        onNavigate={setActiveNav}
+        onNavigateLanding={() => setView('landing')}
+      />
 
       {/* 2. Main Workspace Content Area below Topbar */}
       <div className="app-main">

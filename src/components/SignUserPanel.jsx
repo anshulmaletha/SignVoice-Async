@@ -35,12 +35,31 @@ export default function SignUserPanel() {
   const lastGestureRef = useRef(null)
   const [errorCode, setErrorCode] = useState(null)
   const [isReady, setIsReady] = useState(false)
+  const [isCameraOn, setIsCameraOn] = useState(true)
   const [current, setCurrent] = useState({ gesture: 'NONE', text: '', confidence: 0 })
   const [lastSpoken, setLastSpoken] = useState('')
   const [isSpeaking, setIsSpeaking] = useState(false)
 
   useEffect(() => {
     let cancelled = false
+
+    if (!isCameraOn) {
+      // Cleanly stop any existing gesture loop and camera media tracks
+      if (controlRef.current) {
+        try { controlRef.current.stop() } catch (_) {}
+        controlRef.current = null
+      }
+      if (streamRef.current) {
+        try { streamRef.current.getTracks().forEach((t) => t.stop()) } catch (_) {}
+        streamRef.current = null
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null
+      }
+      setIsReady(false)
+      setCurrent({ gesture: 'NONE', text: '', confidence: 0 })
+      return
+    }
 
     function handleGesture(gestureResult) {
       if (cancelled) return
@@ -123,10 +142,14 @@ export default function SignUserPanel() {
 
     return () => {
       cancelled = true
-      if (controlRef.current) controlRef.current.stop()
-      if (streamRef.current) streamRef.current.getTracks().forEach((t) => t.stop())
+      if (controlRef.current) {
+        try { controlRef.current.stop() } catch (_) {}
+      }
+      if (streamRef.current) {
+        try { streamRef.current.getTracks().forEach((t) => t.stop()) } catch (_) {}
+      }
     }
-  }, [])
+  }, [isCameraOn])
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.speechSynthesis) return
@@ -138,6 +161,10 @@ export default function SignUserPanel() {
     if (lastSpoken) {
       speak(lastSpoken)
     }
+  }
+
+  function handleToggleCamera(turnOn) {
+    setIsCameraOn(turnOn)
   }
 
   return (
@@ -158,11 +185,13 @@ export default function SignUserPanel() {
 
       {errorCode && <PermissionBanner type="camera" code={errorCode} />}
 
-      {/* Main Camera Viewport with Warm HUD Brackets */}
+      {/* Main Camera Viewport with Camera ON/OFF controls & Warm HUD Brackets */}
       <CameraFeed
         videoRef={videoRef}
         error={errorCode}
         isReady={isReady}
+        isCameraOn={isCameraOn}
+        onToggleCamera={handleToggleCamera}
         gestureText={current.text}
         confidence={current.confidence}
       />

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { AnimatedBackground } from './AnimatedBackground.jsx'
 import { getSettings, updateSettings, subscribeSettings } from '../services/settingsStore.js'
 
-export default function Header({ activeNav = 'dashboard', onNavigate }) {
+export default function Header({ activeNav = 'dashboard', onNavigate, onNavigateLanding }) {
   const [settings, setSettings] = useState(getSettings())
 
   useEffect(() => {
@@ -28,9 +28,10 @@ export default function Header({ activeNav = 'dashboard', onNavigate }) {
       {/* LEFT: Brand Header */}
       <div
         className="topnav-brand"
-        onClick={() => onNavigate && onNavigate('dashboard')}
+        onClick={() => onNavigateLanding ? onNavigateLanding() : (onNavigate && onNavigate('dashboard'))}
         role="button"
         tabIndex={0}
+        title="Return to Landing Page"
       >
         <div className="topnav-logo" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="topnav-logo-icon">
@@ -38,7 +39,10 @@ export default function Header({ activeNav = 'dashboard', onNavigate }) {
           </svg>
         </div>
         <div className="topnav-brand-text">
-          <span className="topnav-brand-name">SignVoice</span>
+          <span className="topnav-brand-name">
+            <span className="wordmark-sign">Sign</span>
+            <span className="wordmark-voice">Voice</span>
+          </span>
           <span className="topnav-brand-sub">MULTIMODAL AI</span>
         </div>
       </div>
