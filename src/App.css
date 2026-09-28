@@ -127,59 +127,47 @@ html, body {
   border-bottom: 1px solid rgba(210, 200, 193, 0.4);
 }
 
-/* LEFT: Brand Header */
+/* LEFT: Brand Header & Logo Badge */
 .topnav-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  background: none;
+  border: none;
+  padding: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
 .topnav-brand:hover {
-  opacity: 0.9;
+  opacity: 0.92;
+  transform: translateY(-1px);
 }
 
-.topnav-logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background-color: var(--beige-accent);
-  border: 1px solid var(--border-color);
-  display: flex;
+.topnav-brand:focus-visible {
+  outline: 2px solid var(--taupe-primary);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+.brand-logo-badge {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--charcoal-dark);
+  height: 40px;
+  padding: 4px 14px;
+  background-color: #1C1A19;
+  border-radius: 999px;
+  border: 1px solid rgba(241, 231, 221, 0.14);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(50, 50, 50, 0.05);
 }
 
-.topnav-logo-icon {
-  width: 24px;
-  height: 24px;
-  color: var(--charcoal-dark);
-}
-
-.topnav-brand-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.topnav-brand-name {
-  font-family: var(--font-display);
-  font-size: 1.2rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--charcoal-dark);
-  line-height: 1.15;
-}
-
-.topnav-brand-sub {
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: var(--taupe-muted);
-  text-transform: uppercase;
+.brand-logo-img {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 /* CENTER: Floating Rounded Capsule Menu */

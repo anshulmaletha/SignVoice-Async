@@ -78,27 +78,17 @@
 .landing-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
   background: none;
   border: none;
-  color: var(--text-dark-primary);
-  font-size: 24px;
   cursor: pointer;
   padding: 0;
-  font-family: var(--font-family);
   text-decoration: none;
 }
 
 .landing-logo:focus-visible {
   outline: 2px solid var(--glow-accent);
   outline-offset: 4px;
-  border-radius: 6px;
-}
-
-.landing-logo-icon {
-  width: 28px;
-  height: 28px;
-  stroke: var(--glow-accent);
+  border-radius: 999px;
 }
 
 .landing-nav-links {
