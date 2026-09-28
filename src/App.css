@@ -2891,6 +2891,13 @@ html.dark .dash-card,
 html.dark .metric-card,
 html.dark .settings-card,
 html.dark .profile-card,
+html.dark .profile-hero-card,
+html.dark .sessions-list-panel,
+html.dark .session-transcript-panel,
+html.dark .save-session-bar,
+html.dark .request-card,
+html.dark .modal-card,
+html.dark .friends-empty-state,
 html.dark .friend-card,
 html.dark .workspace-view {
   background: rgba(42, 36, 32, 0.88);
@@ -2909,11 +2916,47 @@ html.dark .speech-card,
 html.dark .conversation-feed,
 html.dark .form-select,
 html.dark .form-input,
+html.dark .search-input,
+html.dark .save-session-input,
+html.dark .session-item-card,
+html.dark .session-msg--speech,
+html.dark .session-msg-bubble--speech,
+html.dark .btn-reject,
+html.dark .form-static-val,
+html.dark .form-textarea,
+html.dark .setting-toggle-row,
 html.dark .gesture-badge--none,
 html.dark .gesture-badge--unknown,
 html.dark .gesture-badge--active {
   background-color: rgba(28, 24, 21, 0.85);
   border: 1px solid rgba(241, 231, 221, 0.08);
+  color: #F1E7DD;
+}
+
+html.dark .search-input::placeholder,
+html.dark .save-session-input::placeholder,
+html.dark .form-textarea::placeholder,
+html.dark .form-input::placeholder {
+  color: #CDBFB2;
+}
+
+html.dark .search-icon {
+  color: #CDBFB2;
+}
+
+html.dark .session-item-card:hover {
+  background-color: rgba(241, 231, 221, 0.08);
+  border-color: rgba(244, 199, 154, 0.3);
+}
+
+html.dark .status-indicator,
+html.dark .status-badge-dot {
+  border-color: rgba(42, 36, 32, 0.95);
+}
+
+html.dark .profile-role-pill,
+html.dark .dash-session-badge {
+  background-color: rgba(169, 137, 119, 0.25);
   color: #F1E7DD;
 }
 
