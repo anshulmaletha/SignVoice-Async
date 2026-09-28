@@ -33,20 +33,43 @@ export const GESTURE_MAP = Object.freeze({
   }
 });
 
+export const CUSTOM_GESTURE_MAP = Object.freeze({
+  WATER: {
+    gesture: 'WATER',
+    text: 'Water'
+  },
+  FOOD: {
+    gesture: 'FOOD',
+    text: 'Food'
+  },
+  GOODBYE: {
+    gesture: 'GOODBYE',
+    text: 'Goodbye'
+  },
+  PLEASE: {
+    gesture: 'PLEASE',
+    text: 'Please'
+  },
+  SORRY: {
+    gesture: 'SORRY',
+    text: 'Sorry'
+  }
+});
+
 // Named constant for minimum confidence threshold (Task A5)
 // Classifications with score < CONFIDENCE_THRESHOLD fall back to UNKNOWN
 export const CONFIDENCE_THRESHOLD = 0.6;
 
 /**
- * Maps a raw MediaPipe gesture detection result to the frozen SignVoice GESTURE_OUTPUT contract.
+ * Maps a raw MediaPipe or custom gesture detection result to the frozen SignVoice GESTURE_OUTPUT contract.
  *
  * Case 1: No hand detected -> gesture: "NONE", text: "", confidence: 0
  * Case 2: Hand detected but confidence < CONFIDENCE_THRESHOLD -> gesture: "UNKNOWN", text: "Gesture not recognized", confidence: score
  * Case 3: Supported gesture with confidence >= CONFIDENCE_THRESHOLD -> gesture: "<CODE>", text: "<Text>", confidence: score
  * Case 4: Unsupported gesture -> gesture: "UNKNOWN", text: "Gesture not recognized", confidence: score
  *
- * @param {string} categoryName - Raw category name from MediaPipe (or 'None' / empty).
- * @param {number} [score=0] - MediaPipe confidence score (0.0 to 1.0).
+ * @param {string} categoryName - Raw category name from MediaPipe or custom classifier (or 'None' / empty).
+ * @param {number} [score=0] - Confidence score (0.0 to 1.0).
  * @param {string|number} [timestamp=new Date().toLocaleTimeString()] - Human-readable time string.
  * @returns {{ gesture: string, text: string, confidence: number, timestamp: string }}
  */
@@ -75,7 +98,7 @@ export function mapGesture(categoryName, score = 0, timestamp = new Date().toLoc
   }
 
   // Check if category exists in frozen gesture dictionary
-  const matched = GESTURE_MAP[categoryName];
+  const matched = GESTURE_MAP[categoryName] || CUSTOM_GESTURE_MAP[categoryName];
   if (matched) {
     return {
       gesture: matched.gesture,
@@ -96,6 +119,7 @@ export function mapGesture(categoryName, score = 0, timestamp = new Date().toLoc
 
 export default {
   GESTURE_MAP,
+  CUSTOM_GESTURE_MAP,
   CONFIDENCE_THRESHOLD,
   mapGesture
 };

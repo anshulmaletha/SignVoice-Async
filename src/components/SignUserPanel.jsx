@@ -9,7 +9,20 @@ import ConfidenceBar from './ConfidenceBar.jsx'
 import ConnectionStatusBadge from './ConnectionStatusBadge.jsx'
 import PermissionBanner from './PermissionBanner.jsx'
 
-const SUPPORTED = new Set(['HELLO', 'YES', 'NO', 'HELP', 'THANK_YOU', 'STOP', 'WAIT'])
+const SUPPORTED = new Set([
+  'HELLO',
+  'YES',
+  'NO',
+  'HELP',
+  'THANK_YOU',
+  'STOP',
+  'WAIT',
+  'WATER',
+  'FOOD',
+  'GOODBYE',
+  'PLEASE',
+  'SORRY'
+])
 
 const isDemoMode =
   typeof window !== 'undefined' &&

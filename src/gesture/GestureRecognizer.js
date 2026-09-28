@@ -1,5 +1,6 @@
 import { FilesetResolver, GestureRecognizer } from '@mediapipe/tasks-vision';
-import { mapGesture } from './gestureMap.js';
+import { mapGesture, GESTURE_MAP, CONFIDENCE_THRESHOLD } from './gestureMap.js';
+import { predictCustomGesture } from './customGestureClassifier.js';
 
 // Named constant for gesture stabilization / debounce threshold (Task A4)
 // Approximately 15 consecutive frames = ~500ms at 30 FPS
@@ -133,10 +134,12 @@ export async function startGestureRecognition(videoElement, onResult, options = 
           // Step 3 & 8: Call recognizeForVideo
           const results = recognizer.recognizeForVideo(videoElement, timestamp);
 
-          // Step 5: Extract highest-ranked gesture category
+          // Step 5: Extract gesture category (built-in MediaPipe first, custom classifier fallback)
           let categoryName = 'None';
           let score = 0;
+          let builtinMatched = false;
 
+          // Priority 1: Built-in MediaPipe gesture match
           if (
             results &&
             results.gestures &&
@@ -144,8 +147,23 @@ export async function startGestureRecognition(videoElement, onResult, options = 
             results.gestures[0].length > 0
           ) {
             const topGesture = results.gestures[0][0];
-            categoryName = topGesture.categoryName || 'None';
-            score = typeof topGesture.score === 'number' ? topGesture.score : 0;
+            const candidateName = topGesture.categoryName || 'None';
+            const candidateScore = typeof topGesture.score === 'number' ? topGesture.score : 0;
+
+            if (GESTURE_MAP[candidateName] && candidateScore >= CONFIDENCE_THRESHOLD) {
+              categoryName = candidateName;
+              score = candidateScore;
+              builtinMatched = true;
+            }
+          }
+
+          // Priority 2: Custom landmark gesture classification fallback
+          if (!builtinMatched && results && results.landmarks && results.landmarks.length > 0) {
+            const customRes = predictCustomGesture(results.landmarks[0], CONFIDENCE_THRESHOLD);
+            if (customRes.categoryName && customRes.categoryName !== 'None' && customRes.categoryName !== 'UNKNOWN') {
+              categoryName = customRes.categoryName;
+              score = customRes.confidence;
+            }
           }
 
           // Task A4: Frame counter and stability check
