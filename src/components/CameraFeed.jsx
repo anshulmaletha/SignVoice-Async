@@ -12,7 +12,7 @@ export default function CameraFeed({
   if (error || !isCameraOn) {
     return (
       <div className="camera-viewport camera-viewport--offline">
-        <div className="camera-feed camera-feed--unavailable">
+        <div className="camera-feed--unavailable">
           <div className="camera-feed__unavailable-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="unavail-svg">
               <path strokeLinecap="round" strokeLinejoin="round" d="M1 1l22 22M21 21H3a2 2 0 01-2-2V8a2 2 0 012-2h3l2-3h6l2 3h1.5M10.5 10.5A3.5 3.5 0 0014 14m1-4a3.5 3.5 0 00-3.5-3.5" />
