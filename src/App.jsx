@@ -11,10 +11,25 @@ import SessionsView from './views/SessionsView.jsx'
 import FriendsView from './views/FriendsView.jsx'
 import ProfileView from './views/ProfileView.jsx'
 import SettingsView from './views/SettingsView.jsx'
+import MeetingRoom from './components/meeting/MeetingRoom.jsx'
+import { generateMeetingId } from './utils/meetingId.js'
+
+function getMeetingIdFromPath(pathname) {
+  const match = (pathname || '').match(/^\/meeting\/([A-Za-z0-9_-]+)/)
+  return match ? match[1] : null
+}
 
 export default function App() {
+  const [currentMeetingId, setCurrentMeetingId] = useState(() => {
+    return getMeetingIdFromPath(window.location.pathname)
+  })
+
   const [view, setView] = useState(() => {
     const path = window.location.pathname
+    const meetingId = getMeetingIdFromPath(path)
+    if (meetingId) {
+      return 'meeting'
+    }
     const isAuth = sessionStorage.getItem('signvoice_auth') === 'true'
     if (path === '/app') {
       return isAuth ? 'app' : 'login'
@@ -25,12 +40,21 @@ export default function App() {
     return 'landing'
   })
 
-  const [activeNav, setActiveNav] = useState('sign-speak')
+  const [activeNav, setActiveNav] = useState('dashboard')
 
   // Handle browser back/forward button navigation
   useEffect(() => {
     const handlePopState = () => {
       const path = window.location.pathname
+      const meetingId = getMeetingIdFromPath(path)
+
+      if (meetingId) {
+        setCurrentMeetingId(meetingId)
+        setView('meeting')
+        return
+      }
+
+      setCurrentMeetingId(null)
       const isAuth = sessionStorage.getItem('signvoice_auth') === 'true'
 
       if (path === '/app') {
@@ -62,7 +86,7 @@ export default function App() {
     const isAuth = sessionStorage.getItem('signvoice_auth') === 'true'
     if (isAuth) {
       navigateTo('app', '/app')
-      setActiveNav('sign-speak')
+      setActiveNav('dashboard')
     } else {
       navigateTo('login', '/login')
     }
@@ -71,7 +95,7 @@ export default function App() {
   const handleLoginSuccess = () => {
     sessionStorage.setItem('signvoice_auth', 'true')
     navigateTo('app', '/app')
-    setActiveNav('sign-speak')
+    setActiveNav('dashboard')
   }
 
   const handleLogout = () => {
@@ -79,8 +103,34 @@ export default function App() {
     navigateTo('login', '/login')
   }
 
+  const handleCreateMeeting = (meetingId) => {
+    const id = meetingId || generateMeetingId()
+    setCurrentMeetingId(id)
+    navigateTo('meeting', `/meeting/${id}`)
+  }
+
+  const handleLeaveMeeting = () => {
+    setCurrentMeetingId(null)
+    const isAuth = sessionStorage.getItem('signvoice_auth') === 'true'
+    if (isAuth) {
+      navigateTo('app', '/app')
+      setActiveNav('dashboard')
+    } else {
+      navigateTo('landing', '/')
+    }
+  }
+
   const handleNavigateLanding = () => {
     navigateTo('landing', '/')
+  }
+
+  if (view === 'meeting' && currentMeetingId) {
+    return (
+      <MeetingRoom
+        meetingId={currentMeetingId}
+        onLeaveMeeting={handleLeaveMeeting}
+      />
+    )
   }
 
   if (view === 'landing') {
@@ -125,7 +175,10 @@ export default function App() {
 
         {activeNav === 'dashboard' && (
           <main className="workspace-view" aria-label="Dashboard Overview">
-            <DashboardView onNavigate={setActiveNav} />
+            <DashboardView
+              onNavigate={setActiveNav}
+              onCreateMeeting={() => handleCreateMeeting()}
+            />
           </main>
         )}
 
