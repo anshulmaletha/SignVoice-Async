@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import signvoiceLogo from '../assets/signvoice-logo.jpg'
 import { setActiveProfile } from '../services/profileStore.js'
+import Particles from '../components/Particles.jsx'
 
 const DEMO_ACCOUNTS = [
   { username: 'Anshul', password: 'anshul123' },
@@ -41,6 +42,18 @@ export default function LoginView({ onLoginSuccess, onBackToLanding }) {
 
   return (
     <div className="login-root">
+      {/* 800 particle ambient background animation with full viewport distribution */}
+      <Particles
+        particleCount={800}
+        speed={0.25}
+        particleBaseSize={55}
+        moveParticlesOnHover={true}
+        particleHoverFactor={0.3}
+        alphaParticles={true}
+        disableRotation={false}
+        particleColors={['#8C7B70', '#A99A91', '#DDD0C8']}
+      />
+
       <div className="login-card">
         {/* Brand Header */}
         <div className="login-brand-header">
