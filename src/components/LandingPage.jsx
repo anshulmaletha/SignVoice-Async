@@ -147,51 +147,18 @@ export default function LandingPage({ onGetStarted }) {
           </div>
         </button>
 
-        {/* Desktop Links: About | How It Works | Features | FAQ | Get Started */}
+        {/* Desktop Links: More Info | Get Started */}
         <ul className={`landing-nav-links ${mobileMenuOpen ? 'landing-nav-links--mobile-open' : ''}`}>
           <li>
             <button
               type="button"
               className="landing-nav-link"
-              onClick={(e) => {
+              onClick={() => {
                 setMobileMenuOpen(false)
-                openModal('about', e.currentTarget)
+                setMoreInfoOpen(true)
               }}
             >
-              About
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              className="landing-nav-link"
-              onClick={(e) => {
-                setMobileMenuOpen(false)
-                openModal('how-it-works', e.currentTarget)
-              }}
-            >
-              How It Works
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              className="landing-nav-link"
-              onClick={(e) => {
-                setMobileMenuOpen(false)
-                openModal('features', e.currentTarget)
-              }}
-            >
-              Features
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              className="landing-nav-link"
-              onClick={scrollToFaq}
-            >
-              FAQ
+              More Info
             </button>
           </li>
           <li>
@@ -258,19 +225,6 @@ export default function LandingPage({ onGetStarted }) {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
                 <line x1="5" y1="12" x2="19" y2="12" />
                 <polyline points="12 5 19 12 12 19" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className="btn-more-info"
-              onClick={() => setMoreInfoOpen(true)}
-              title="Explore interactive information"
-            >
-              <span>More Info</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-                <circle cx="12" cy="12" r="9" />
-                <line x1="12" y1="8" x2="12.01" y2="8" />
-                <polyline points="11 12 12 12 12 16 13 16" />
               </svg>
             </button>
             <button
