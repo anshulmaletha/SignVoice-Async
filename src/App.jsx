@@ -17,6 +17,7 @@ import CookieBanner from './components/CookieBanner.jsx'
 import BackToTop from './components/BackToTop.jsx'
 import Toast from './components/Toast.jsx'
 import ImportantInfoModal from './components/ImportantInfoModal.jsx'
+import { setActiveProfile, clearActiveProfile } from './services/profileStore.js'
 
 const APP_NAV_ROUTES = ['dashboard', 'sign-speak', 'sessions', 'friends', 'profile', 'settings']
 
@@ -122,7 +123,10 @@ export default function App() {
     }
   }
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (username) => {
+    if (username) {
+      setActiveProfile(username)
+    }
     sessionStorage.setItem('signvoice_auth', 'true')
     const redirectNav = sessionStorage.getItem('signvoice_redirect')
     sessionStorage.removeItem('signvoice_redirect')
@@ -135,6 +139,7 @@ export default function App() {
   const handleLogout = () => {
     sessionStorage.removeItem('signvoice_auth')
     sessionStorage.removeItem('signvoice_redirect')
+    clearActiveProfile()
     navigateTo('login', '/login')
   }
 
