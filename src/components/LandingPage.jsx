@@ -7,7 +7,7 @@ import BackToTop from './BackToTop.jsx'
 import Toast from './Toast.jsx'
 import ImportantInfoModal from './ImportantInfoModal.jsx'
 import CircularGallery from './CircularGallery.jsx'
-import signvoiceLogo from '../assets/signvoice-logo.jpg'
+import signvoiceSymbol from '../assets/signvoice-symbol.png'
 
 export default function LandingPage({ onGetStarted }) {
   const [modalOpen, setModalOpen] = useState(false)
@@ -124,16 +124,13 @@ export default function LandingPage({ onGetStarted }) {
         >
           <div className="brand-logo-badge">
             <img
-              src={signvoiceLogo}
-              alt="SignVoice"
+              src={signvoiceSymbol}
+              alt="SignVoice Symbol"
               className="brand-logo-img"
               height="40"
             />
           </div>
           <div className="landing-logo-brand-text">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22" className="landing-hand-icon">
-              <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8M18 11a2 2 0 0 1 2 2v2a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.8-6-2.5L2 14" />
-            </svg>
             <span className="landing-logo-wordmark">
               <span className="wordmark-sign">Sign</span>
               <span className="wordmark-voice">Voice</span>

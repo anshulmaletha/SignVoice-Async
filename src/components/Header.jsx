@@ -3,7 +3,7 @@ import { AnimatedBackground } from './AnimatedBackground.jsx'
 import { getSettings, updateSettings, subscribeSettings } from '../services/settingsStore.js'
 import { getProfile, subscribeProfile } from '../services/profileStore.js'
 import CopyButton from './CopyButton.jsx'
-import signvoiceLogo from '../assets/signvoice-logo.jpg'
+import signvoiceSymbol from '../assets/signvoice-symbol.png'
 
 export default function Header({ activeNav = 'dashboard', onNavigate, onNavigateLanding, onLogout, onOpenImportantInfo }) {
   const [settings, setSettings] = useState(getSettings())
@@ -74,12 +74,16 @@ export default function Header({ activeNav = 'dashboard', onNavigate, onNavigate
         >
           <div className="brand-logo-badge">
             <img
-              src={signvoiceLogo}
-              alt="SignVoice"
+              src={signvoiceSymbol}
+              alt="SignVoice Symbol"
               className="brand-logo-img"
               height="40"
             />
           </div>
+          <span className="topnav-brand-text">
+            <span className="wordmark-sign">Sign</span>
+            <span className="wordmark-voice">Voice</span>
+          </span>
         </div>
 
         {/* Reusable Meeting ID Share Pill with Copy Button */}
