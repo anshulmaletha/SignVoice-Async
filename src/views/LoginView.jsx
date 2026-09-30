@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import signvoiceLogo from '../assets/signvoice-logo.jpg'
+import signvoiceSymbol from '../assets/signvoice-symbol.png'
 import { setActiveProfile } from '../services/profileStore.js'
 import Particles from '../components/Particles.jsx'
 
@@ -59,12 +59,16 @@ export default function LoginView({ onLoginSuccess, onBackToLanding }) {
         <div className="login-brand-header">
           <div className="brand-logo-badge">
             <img
-              src={signvoiceLogo}
-              alt="SignVoice"
+              src={signvoiceSymbol}
+              alt="SignVoice Symbol"
               className="brand-logo-img"
               height="40"
             />
           </div>
+          <span className="login-brand-text">
+            <span className="wordmark-sign">Sign</span>
+            <span className="wordmark-voice">Voice</span>
+          </span>
         </div>
 
         <div className="eyebrow-text login-eyebrow">SIGNVOICE AI</div>

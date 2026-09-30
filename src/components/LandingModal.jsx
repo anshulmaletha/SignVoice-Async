@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import FAQSection from './FAQSection.jsx'
 
 export default function LandingModal({ isOpen, activeTab, onTabChange, onClose, onGetStarted, triggerRef }) {
   const modalRef = useRef(null)
@@ -74,6 +75,7 @@ export default function LandingModal({ isOpen, activeTab, onTabChange, onClose, 
       case 'about': return 'ABOUT SIGNVOICE'
       case 'how-it-works': return 'HOW IT WORKS'
       case 'features': return 'PLATFORM FEATURES'
+      case 'faq': return 'FREQUENTLY ASKED QUESTIONS'
       default: return 'SIGNVOICE'
     }
   }
@@ -83,6 +85,7 @@ export default function LandingModal({ isOpen, activeTab, onTabChange, onClose, 
       case 'about': return 'Communication without barriers.'
       case 'how-it-works': return 'Real-Time Gesture & Speech Pipeline'
       case 'features': return 'Everything you need to connect.'
+      case 'faq': return 'Questions & Answers'
       default: return 'Communication without barriers.'
     }
   }
@@ -117,7 +120,7 @@ export default function LandingModal({ isOpen, activeTab, onTabChange, onClose, 
           </button>
         </div>
 
-        {/* 3 Tabs Header */}
+        {/* 4 Tabs Header */}
         <div className="modal-tabs" role="tablist">
           <button
             type="button"
@@ -145,6 +148,15 @@ export default function LandingModal({ isOpen, activeTab, onTabChange, onClose, 
             onClick={() => onTabChange('features')}
           >
             Features
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'faq'}
+            className={`modal-tab-btn ${activeTab === 'faq' ? 'modal-tab-btn--active' : ''}`}
+            onClick={() => onTabChange('faq')}
+          >
+            FAQ
           </button>
         </div>
 
@@ -266,6 +278,12 @@ export default function LandingModal({ isOpen, activeTab, onTabChange, onClose, 
                   <p className="feature-card-desc">revisit past conversations.</p>
                 </div>
               </div>
+            </div>
+          )}
+
+          {activeTab === 'faq' && (
+            <div className="modal-tab-content modal-tab-faq">
+              <FAQSection />
             </div>
           )}
         </div>
