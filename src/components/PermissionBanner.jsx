@@ -11,6 +11,8 @@ const MESSAGES = {
     PERMISSION_DENIED: 'Microphone permission denied. Please allow microphone access and reload.',
     NO_SPEECH_DETECTED: 'No speech detected. Try speaking closer to the microphone.',
     NETWORK_ERROR: 'Network error during speech recognition. Check your connection.',
+    SERVICE_NOT_ALLOWED: 'Speech recognition service is not allowed by your browser.',
+    AUDIO_CAPTURE_FAILED: 'Audio capture device failed. Please check your microphone hardware.',
   },
 }
 

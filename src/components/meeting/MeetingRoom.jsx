@@ -563,8 +563,8 @@ export default function MeetingRoom({ meetingId, onLeaveMeeting }) {
 
     const now = Date.now()
     if (
-      finalText === lastFinalSpeechRef.current &&
-      now - lastFinalSpeechTimeRef.current < 1200
+      finalText.toLowerCase() === lastFinalSpeechRef.current.toLowerCase() &&
+      now - lastFinalSpeechTimeRef.current < 1500
     ) {
       return
     }
@@ -612,9 +612,18 @@ export default function MeetingRoom({ meetingId, onLeaveMeeting }) {
         startMockSpeechStream(handleSpeechResult)
       } else {
         startListening(handleSpeechResult, (err) => {
-          console.warn('[MeetingRoom] Speech recognition error:', err)
+          console.warn('[MeetingRoom] Speech recognition fatal error:', err)
+          if (err === 'PERMISSION_DENIED') {
+            setInterimCaption('Microphone permission denied for speech recognition.')
+          } else if (err === 'SERVICE_NOT_ALLOWED') {
+            setInterimCaption('Speech recognition service disallowed by browser.')
+          } else if (err === 'NETWORK_ERROR') {
+            setInterimCaption('Speech recognition network service unavailable.')
+          } else {
+            setInterimCaption(`Speech recognition error: ${err}`)
+          }
+          setTimeout(() => setInterimCaption(''), 4000)
           setIsTranscribing(false)
-          setInterimCaption('')
         })
       }
     }
