@@ -6,27 +6,54 @@ import CookieBanner from './CookieBanner.jsx'
 import BackToTop from './BackToTop.jsx'
 import Toast from './Toast.jsx'
 import ImportantInfoModal from './ImportantInfoModal.jsx'
+import CircularGallery from './CircularGallery.jsx'
 import signvoiceLogo from '../assets/signvoice-logo.jpg'
 
 export default function LandingPage({ onGetStarted }) {
   const [modalOpen, setModalOpen] = useState(false)
   const [modalTab, setModalTab] = useState('about')
   const [infoModalOpen, setInfoModalOpen] = useState(false)
+  const [moreInfoOpen, setMoreInfoOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const triggerRef = useRef(null)
 
-  // Support Deep Links (#about, #how-it-works, #features, #faq)
+  // 4 Conceptual Cards for SignVoice Interactive Circular Gallery
+  const galleryItems = [
+    {
+      key: 'about',
+      title: 'ABOUT',
+      badge: 'ACCESSIBILITY',
+      subtitle: 'AI-powered communication designed to bridge gesture and speech.'
+    },
+    {
+      key: 'how-it-works',
+      title: 'HOW IT WORKS',
+      badge: 'PIPELINE',
+      subtitle: 'Recognize gestures, process them with AI, and convert them into spoken communication.'
+    },
+    {
+      key: 'features',
+      title: 'FEATURES',
+      badge: 'CAPABILITIES',
+      subtitle: 'Gesture to Speech, Speech to Text, Real-Time Conversation, and Camera AI.'
+    },
+    {
+      key: 'faq',
+      title: 'FAQ',
+      badge: 'SUPPORT',
+      subtitle: 'Frequently Asked Questions about SignVoice accessibility and usage.'
+    }
+  ]
+
+  // Support Deep Links (#about, #how-it-works, #features, #faq, #more-info)
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '')
-      if (['about', 'how-it-works', 'features'].includes(hash)) {
+      if (['about', 'how-it-works', 'features', 'faq'].includes(hash)) {
         setModalTab(hash)
         setModalOpen(true)
-      } else if (hash === 'faq') {
-        const faqElem = document.getElementById('faq')
-        if (faqElem) {
-          faqElem.scrollIntoView({ behavior: 'smooth' })
-        }
+      } else if (hash === 'more-info') {
+        setMoreInfoOpen(true)
       }
     }
 
@@ -34,6 +61,29 @@ export default function LandingPage({ onGetStarted }) {
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
+
+  // Lock body scroll when More Info modal is open
+  useEffect(() => {
+    if (moreInfoOpen) {
+      const originalOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = originalOverflow
+      }
+    }
+  }, [moreInfoOpen])
+
+  // Escape key closes More Info modal (unless an inner modal is currently active)
+  useEffect(() => {
+    if (!moreInfoOpen) return
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && !modalOpen && !infoModalOpen) {
+        setMoreInfoOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [moreInfoOpen, modalOpen, infoModalOpen])
 
   const openModal = (tab, refTarget) => {
     if (refTarget) triggerRef.current = refTarget
@@ -56,6 +106,10 @@ export default function LandingPage({ onGetStarted }) {
       faqElem.scrollIntoView({ behavior: 'smooth' })
       window.history.pushState(null, '', '#faq')
     }
+  }
+
+  const handleGalleryCardClick = (item) => {
+    openModal(item.key)
   }
 
   return (
@@ -84,6 +138,12 @@ export default function LandingPage({ onGetStarted }) {
               <span className="wordmark-sign">Sign</span>
               <span className="wordmark-voice">Voice</span>
             </span>
+            <div className="landing-audio-accent" title="Audio / Sound-Wave Accent" aria-hidden="true">
+              <span className="audio-wave-bar bar-1"></span>
+              <span className="audio-wave-bar bar-2"></span>
+              <span className="audio-wave-bar bar-3"></span>
+              <span className="audio-wave-bar bar-4"></span>
+            </div>
           </div>
         </button>
 
@@ -171,7 +231,7 @@ export default function LandingPage({ onGetStarted }) {
         </button>
       </nav>
 
-      {/* 2. Hero Section: Left Text + Substantially Larger SignVoice AI Artwork on Right */}
+      {/* 2. Original Hero Section: Left Text + SignVoice AI Hero Artwork on Right */}
       <section className="landing-hero" aria-label="Hero Section">
         {/* Left Column */}
         <div className="hero-left">
@@ -198,6 +258,19 @@ export default function LandingPage({ onGetStarted }) {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
                 <line x1="5" y1="12" x2="19" y2="12" />
                 <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className="btn-more-info"
+              onClick={() => setMoreInfoOpen(true)}
+              title="Explore interactive information"
+            >
+              <span>More Info</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                <circle cx="12" cy="12" r="9" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+                <polyline points="11 12 12 12 12 16 13 16" />
               </svg>
             </button>
             <button
@@ -346,6 +419,57 @@ export default function LandingPage({ onGetStarted }) {
           <div className="tagline-line" />
         </div>
       </footer>
+
+      {/* More Info Popup / Modal with CircularGallery */}
+      {moreInfoOpen && (
+        <div
+          className="more-info-modal-backdrop"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setMoreInfoOpen(false)
+          }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="more-info-modal-title"
+        >
+          <div className="more-info-modal-container">
+            {/* Header */}
+            <div className="more-info-modal-header">
+              <div>
+                <div className="eyebrow-text more-info-modal-eyebrow">EXPLORE SIGNVOICE</div>
+                <h2 id="more-info-modal-title" className="more-info-modal-title">
+                  Interactive Information
+                </h2>
+                <p className="more-info-modal-sub">
+                  Drag, scroll, or click cards to explore SignVoice capabilities
+                </p>
+              </div>
+              <button
+                type="button"
+                className="more-info-close-btn"
+                onClick={() => setMoreInfoOpen(false)}
+                aria-label="Close More Info"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="22" height="22">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Gallery Canvas inside modal */}
+            <div className="more-info-modal-gallery">
+              <CircularGallery
+                items={galleryItems}
+                bend={3}
+                textColor="#F1E7DD"
+                borderRadius={0.05}
+                scrollEase={0.02}
+                onItemClick={handleGalleryCardClick}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal Dialogs */}
       <LandingModal
