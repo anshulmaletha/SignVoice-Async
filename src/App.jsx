@@ -18,9 +18,19 @@ import BackToTop from './components/BackToTop.jsx'
 import Toast from './components/Toast.jsx'
 import ImportantInfoModal from './components/ImportantInfoModal.jsx'
 
+const APP_NAV_ROUTES = ['dashboard', 'sign-speak', 'sessions', 'friends', 'profile', 'settings']
+
 function getMeetingIdFromPath(pathname) {
   const match = (pathname || '').match(/^\/meeting\/([A-Za-z0-9_-]+)/)
   return match ? match[1] : null
+}
+
+function getNavFromPath(pathname) {
+  const clean = (pathname || '').replace(/^\/+|\/+$/g, '').toLowerCase()
+  if (APP_NAV_ROUTES.includes(clean)) {
+    return clean
+  }
+  return null
 }
 
 export default function App() {
@@ -35,16 +45,20 @@ export default function App() {
       return 'meeting'
     }
     const isAuth = sessionStorage.getItem('signvoice_auth') === 'true'
-    if (path === '/app') {
+    const navRoute = getNavFromPath(path)
+    if (path === '/app' || path === '/app/' || navRoute) {
       return isAuth ? 'app' : 'login'
     }
-    if (path === '/login') {
+    if (path === '/login' || path === '/login/') {
       return 'login'
     }
     return 'landing'
   })
 
-  const [activeNav, setActiveNav] = useState('dashboard')
+  const [activeNav, setActiveNav] = useState(() => {
+    const navRoute = getNavFromPath(window.location.pathname)
+    return navRoute || 'dashboard'
+  })
   const [infoModalOpen, setInfoModalOpen] = useState(false)
 
   // Handle browser back/forward button navigation
@@ -61,15 +75,18 @@ export default function App() {
 
       setCurrentMeetingId(null)
       const isAuth = sessionStorage.getItem('signvoice_auth') === 'true'
+      const navRoute = getNavFromPath(path)
 
-      if (path === '/app') {
+      if (path === '/app' || path === '/app/' || navRoute) {
         if (isAuth) {
           setView('app')
+          setActiveNav(navRoute || 'dashboard')
         } else {
+          sessionStorage.setItem('signvoice_redirect', navRoute || 'dashboard')
           setView('login')
           window.history.replaceState(null, '', '/login')
         }
-      } else if (path === '/login') {
+      } else if (path === '/login' || path === '/login/') {
         setView('login')
       } else {
         setView('landing')
@@ -87,6 +104,14 @@ export default function App() {
     }
   }
 
+  const handleNavChange = (id) => {
+    setActiveNav(id)
+    const targetPath = id === 'dashboard' ? '/app' : `/${id}`
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState(null, '', targetPath)
+    }
+  }
+
   const handleGetStarted = () => {
     const isAuth = sessionStorage.getItem('signvoice_auth') === 'true'
     if (isAuth) {
@@ -99,12 +124,17 @@ export default function App() {
 
   const handleLoginSuccess = () => {
     sessionStorage.setItem('signvoice_auth', 'true')
-    navigateTo('app', '/app')
-    setActiveNav('dashboard')
+    const redirectNav = sessionStorage.getItem('signvoice_redirect')
+    sessionStorage.removeItem('signvoice_redirect')
+    const targetNav = redirectNav || 'dashboard'
+    const targetPath = targetNav === 'dashboard' ? '/app' : `/${targetNav}`
+    navigateTo('app', targetPath)
+    setActiveNav(targetNav)
   }
 
   const handleLogout = () => {
     sessionStorage.removeItem('signvoice_auth')
+    sessionStorage.removeItem('signvoice_redirect')
     navigateTo('login', '/login')
   }
 
@@ -160,7 +190,7 @@ export default function App() {
       {/* 1. Horizontal Top Navigation Bar */}
       <Header
         activeNav={activeNav}
-        onNavigate={setActiveNav}
+        onNavigate={handleNavChange}
         onNavigateLanding={handleNavigateLanding}
         onLogout={handleLogout}
         onOpenImportantInfo={() => setInfoModalOpen(true)}
@@ -186,7 +216,7 @@ export default function App() {
         {activeNav === 'dashboard' && (
           <main className="workspace-view" aria-label="Dashboard Overview">
             <DashboardView
-              onNavigate={setActiveNav}
+              onNavigate={handleNavChange}
               onCreateMeeting={() => handleCreateMeeting()}
             />
           </main>
@@ -194,25 +224,25 @@ export default function App() {
 
         {activeNav === 'sessions' && (
           <main className="workspace-view" aria-label="Past Sessions">
-            <SessionsView onNavigate={setActiveNav} />
+            <SessionsView onNavigate={handleNavChange} />
           </main>
         )}
 
         {activeNav === 'friends' && (
           <main className="workspace-view" aria-label="Friends and Contacts">
-            <FriendsView onNavigate={setActiveNav} />
+            <FriendsView onNavigate={handleNavChange} />
           </main>
         )}
 
         {activeNav === 'profile' && (
           <main className="workspace-view" aria-label="User Profile">
-            <ProfileView onNavigate={setActiveNav} />
+            <ProfileView onNavigate={handleNavChange} />
           </main>
         )}
 
         {activeNav === 'settings' && (
           <main className="workspace-view" aria-label="Settings and Preferences">
-            <SettingsView onNavigate={setActiveNav} />
+            <SettingsView onNavigate={handleNavChange} />
           </main>
         )}
       </div>
