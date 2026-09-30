@@ -6,6 +6,7 @@ import Header from './components/Header.jsx'
 import SignUserPanel from './components/SignUserPanel.jsx'
 import SpeechUserPanel from './components/SpeechUserPanel.jsx'
 import ConversationHistory from './components/ConversationHistory.jsx'
+import QuickMessages from './components/QuickMessages.jsx'
 import DashboardView from './views/DashboardView.jsx'
 import SessionsView from './views/SessionsView.jsx'
 import FriendsView from './views/FriendsView.jsx'
@@ -174,17 +175,22 @@ export default function App() {
       {/* 2. Main Workspace Content Area below Topbar */}
       <div className="app-main">
         {activeNav === 'sign-speak' && (
-          <div className="workspace-columns">
-            {/* Center / Left Column: Real Webcam Feed & Gesture Results */}
-            <main className="column-vision" aria-label="Sign Language Vision Workspace">
-              <SignUserPanel />
-            </main>
+          <div className="sign-speak-workspace">
+            <div className="workspace-columns">
+              {/* Center / Left Column: Real Webcam Feed & Gesture Results */}
+              <main className="column-vision" aria-label="Sign Language Vision Workspace">
+                <SignUserPanel />
+              </main>
 
-            {/* Right Column: Speech Recognition & Live Conversation Feed */}
-            <aside className="column-speech-chat" aria-label="Speech and Live Conversation Workspace">
-              <SpeechUserPanel />
-              <ConversationHistory />
-            </aside>
+              {/* Right Column: Speech Recognition & Live Conversation Feed */}
+              <aside className="column-speech-chat" aria-label="Speech and Live Conversation Workspace">
+                <SpeechUserPanel />
+                <ConversationHistory />
+              </aside>
+            </div>
+
+            {/* Quick Messages Section below the main interface */}
+            <QuickMessages />
           </div>
         )}
 

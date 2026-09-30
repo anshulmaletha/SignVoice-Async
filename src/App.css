@@ -411,6 +411,206 @@ html, body {
   overflow: hidden;
 }
 
+.sign-speak-workspace {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ==========================================================================
+   Quick Messages / Quick Communication Section
+   ========================================================================== */
+
+.quick-messages-section {
+  padding: 0 32px 32px 32px;
+  margin-top: 4px;
+}
+
+.quick-messages-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.quick-messages-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quick-messages-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: var(--beige-accent, #DDD0C8);
+  color: var(--charcoal-dark, #2A2421);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quick-messages-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-dark-primary, #2A2421);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.quick-messages-subtitle {
+  font-size: 13px;
+  color: var(--text-muted, #786C64);
+  margin: 2px 0 0 0;
+}
+
+.quick-messages-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8C7B70;
+  background-color: rgba(140, 123, 112, 0.12);
+  border: 1px solid rgba(140, 123, 112, 0.22);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+/* Quick Messages Grid Layout */
+.quick-messages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.quick-message-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background-color: #ffffff;
+  border: 1px solid var(--border-color, #E4DCD5);
+  border-radius: var(--radius-md, 12px);
+  color: var(--text-dark-primary, #2A2421);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.quick-message-btn:hover {
+  background-color: #FAF6F2;
+  border-color: #8C7B70;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(140, 123, 112, 0.14);
+}
+
+.quick-message-btn:focus-visible {
+  outline: 2px solid #8C7B70;
+  outline-offset: 2px;
+}
+
+.quick-message-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.quick-message-btn__icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quick-message-btn__text {
+  flex: 1;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.quick-message-btn__speaker {
+  opacity: 0.4;
+  flex-shrink: 0;
+  color: #8C7B70;
+  transition: opacity 0.15s ease;
+}
+
+.quick-message-btn:hover .quick-message-btn__speaker {
+  opacity: 0.9;
+}
+
+/* Emergency Shortcut Styling (Subtle warm amber/rose tone) */
+.quick-message-btn--emergency {
+  background-color: #FFFDFB;
+  border-color: rgba(185, 80, 80, 0.25);
+}
+
+.quick-message-btn--emergency:hover {
+  background-color: #FDF4F4;
+  border-color: rgba(185, 80, 80, 0.5);
+  box-shadow: 0 4px 12px rgba(185, 80, 80, 0.12);
+}
+
+/* Active Click State */
+.quick-message-btn--active {
+  background-color: var(--beige-accent, #DDD0C8) !important;
+  border-color: #8C7B70 !important;
+  box-shadow: 0 0 0 2px rgba(140, 123, 112, 0.3) !important;
+}
+
+/* Dark Theme Overrides for Quick Messages */
+html.dark .quick-messages-title {
+  color: #F1E7DD;
+}
+
+html.dark .quick-messages-subtitle {
+  color: #A99A91;
+}
+
+html.dark .quick-messages-icon {
+  background-color: #3A322C;
+  color: #F1E7DD;
+}
+
+html.dark .quick-messages-badge {
+  background-color: rgba(221, 208, 200, 0.08);
+  border-color: rgba(221, 208, 200, 0.18);
+  color: #DDD0C8;
+}
+
+html.dark .quick-message-btn {
+  background-color: #2A2420;
+  border-color: rgba(241, 231, 221, 0.12);
+  color: #F1E7DD;
+}
+
+html.dark .quick-message-btn:hover {
+  background-color: #352D28;
+  border-color: rgba(221, 208, 200, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+html.dark .quick-message-btn--emergency {
+  background-color: #2D2220;
+  border-color: rgba(200, 100, 100, 0.3);
+}
+
+html.dark .quick-message-btn--emergency:hover {
+  background-color: #3B2825;
+  border-color: rgba(220, 110, 110, 0.5);
+}
+
+html.dark .quick-message-btn--active {
+  background-color: #4A3E36 !important;
+  border-color: #DDD0C8 !important;
+}
+
 /* ==========================================================================
    Center Column: Sign & Vision Panel (Dominant Webcam Viewport)
    ========================================================================== */
