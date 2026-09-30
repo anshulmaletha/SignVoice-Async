@@ -84,6 +84,22 @@ export default function SpeechUserPanel() {
     }
   }, [])
 
+  const [manualText, setManualText] = useState('')
+
+  function handleSendText(e) {
+    e.preventDefault()
+    const trimmed = manualText.trim()
+    if (!trimmed) return
+
+    addMessage({ sender: 'speech_user', text: trimmed, type: 'speech' })
+    setManualText('')
+    setStatusMessage('Message sent')
+    if (statusTimerRef.current) clearTimeout(statusTimerRef.current)
+    statusTimerRef.current = setTimeout(() => {
+      setStatusMessage('')
+    }, 1800)
+  }
+
   const currentStatus = !isListening
     ? 'idle'
     : isTtsActive
@@ -141,6 +157,30 @@ export default function SpeechUserPanel() {
             isListening={isListening && !isTtsActive}
           />
         </div>
+
+        {/* Manual text input form */}
+        <form className="speech-text-input-form" onSubmit={handleSendText}>
+          <input
+            type="text"
+            className="speech-text-input"
+            placeholder="Type a message..."
+            value={manualText}
+            onChange={(e) => setManualText(e.target.value)}
+            aria-label="Type a message to send to live conversation"
+          />
+          <button
+            type="submit"
+            className="btn-speech-send"
+            disabled={!manualText.trim()}
+            aria-label="Send typed message"
+          >
+            <span>Send</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="15" height="15">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </button>
+        </form>
       </div>
     </div>
   )
