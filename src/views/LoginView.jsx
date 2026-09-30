@@ -1,5 +1,13 @@
 import React, { useState } from 'react'
 import signvoiceLogo from '../assets/signvoice-logo.jpg'
+import { setActiveProfile } from '../services/profileStore.js'
+
+const DEMO_ACCOUNTS = [
+  { username: 'Anshul', password: 'anshul123' },
+  { username: 'Aarya', password: 'aarya123' },
+  { username: 'Radhika', password: 'radhika123' },
+  { username: 'NeuraX', password: 'signvoice123' }
+]
 
 export default function LoginView({ onLoginSuccess, onBackToLanding }) {
   const [username, setUsername] = useState('')
@@ -11,13 +19,23 @@ export default function LoginView({ onLoginSuccess, onBackToLanding }) {
     e.preventDefault()
     setErrorMessage('')
 
-    if (username === 'NeuraX' && password === 'signvoice123') {
+    const cleanUser = username.trim()
+    const matched = DEMO_ACCOUNTS.find(
+      (acc) =>
+        acc.username.toLowerCase() === cleanUser.toLowerCase() &&
+        acc.password === password
+    )
+
+    if (matched) {
       try {
         sessionStorage.setItem('signvoice_auth', 'true')
       } catch (_) {}
-      onLoginSuccess()
+      setActiveProfile(matched.username)
+      if (onLoginSuccess) {
+        onLoginSuccess(matched.username)
+      }
     } else {
-      setErrorMessage('Incorrect username or password.')
+      setErrorMessage('Invalid username or password.')
     }
   }
 
@@ -66,7 +84,7 @@ export default function LoginView({ onLoginSuccess, onBackToLanding }) {
               className="login-input"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="NeuraX"
+              placeholder="e.g. Anshul, Aarya, Radhika, NeuraX"
               autoComplete="username"
               required
             />
@@ -83,7 +101,7 @@ export default function LoginView({ onLoginSuccess, onBackToLanding }) {
                 className="login-input login-input--password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="signvoice123"
+                placeholder="Enter password"
                 autoComplete="current-password"
                 required
               />
@@ -117,6 +135,17 @@ export default function LoginView({ onLoginSuccess, onBackToLanding }) {
             </svg>
           </button>
         </form>
+
+        {/* Demo Accounts Quick Guide */}
+        <div className="demo-accounts-hint">
+          <span className="demo-hint-title">Demo Accounts:</span>
+          <div className="demo-hint-grid">
+            <span><strong>Anshul</strong> / anshul123</span>
+            <span><strong>Aarya</strong> / aarya123</span>
+            <span><strong>Radhika</strong> / radhika123</span>
+            <span><strong>NeuraX</strong> / signvoice123</span>
+          </div>
+        </div>
 
         <div className="login-footer-link">
           <button

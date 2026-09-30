@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { getSessions, subscribeSessions } from '../services/sessionStore.js'
 import { getFriendsData, subscribeFriends } from '../services/friendStore.js'
 import { getMessages } from '../services/conversationStore.js'
+import { getProfile, subscribeProfile } from '../services/profileStore.js'
 import Aurora from '../components/Aurora.jsx'
 import { GlowActionButton } from '../components/GlowEffect.jsx'
 
@@ -9,21 +10,25 @@ export default function DashboardView({ onNavigate, onCreateMeeting }) {
   const [sessions, setSessions] = useState(getSessions())
   const [friendsData, setFriendsData] = useState(getFriendsData())
   const [liveMsgCount, setLiveMsgCount] = useState(getMessages().length)
+  const [profile, setProfile] = useState(getProfile())
 
   useEffect(() => {
     const unsubSess = subscribeSessions(setSessions)
     const unsubFriends = subscribeFriends(setFriendsData)
+    const unsubProfile = subscribeProfile(setProfile)
     const id = setInterval(() => {
       setLiveMsgCount(getMessages().length)
     }, 1000)
     return () => {
       unsubSess()
       unsubFriends()
+      unsubProfile()
       clearInterval(id)
     }
   }, [])
 
   const onlineFriends = friendsData.friends.filter((f) => f.status === 'online')
+  const firstName = profile.name ? profile.name.split(' ')[0] : (profile.username || 'User')
 
   return (
     <div className="view-container dashboard-view">
@@ -41,7 +46,7 @@ export default function DashboardView({ onNavigate, onCreateMeeting }) {
             <span>Multimodal Communication AI</span>
           </div>
           <h2 className="dashboard-hero__title">
-            Good morning, Anshul.
+            Good morning, {firstName}.
           </h2>
           <p className="dashboard-hero__desc">
             Communicate naturally. Sign, speak, and connect seamlessly with real-time gesture recognition and voice synthesis.
@@ -68,127 +73,149 @@ export default function DashboardView({ onNavigate, onCreateMeeting }) {
               <span>Start Communication</span>
             </button>
             
-            <button
-              type="button"
-              className="btn-secondary"
+            <GlowActionButton
+              variant="secondary"
               onClick={() => onNavigate('sessions')}
+              icon={
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="btn-icon">
+                  <circle cx="12" cy="12" r="9" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+              }
             >
-              <span>View Past Sessions</span>
-            </button>
+              View History
+            </GlowActionButton>
           </div>
         </div>
       </div>
 
-      {/* Metric Cards Row */}
-      <div className="dashboard-metrics-grid">
-        <div className="metric-card" onClick={() => onNavigate('sign-speak')} role="button" tabIndex={0}>
+      {/* Metrics Row */}
+      <div className="dashboard-grid">
+        <div className="metric-card">
           <div className="metric-card__header">
-            <span className="metric-card__label">Active Workspace</span>
-            <span className="metric-card__icon">👁️</span>
+            <span className="metric-icon">💬</span>
+            <span className="metric-tag">Live Session</span>
           </div>
-          <div className="metric-card__value">
-            {liveMsgCount > 0 ? `${liveMsgCount} Messages` : 'Standby'}
-          </div>
-          <div className="metric-card__sub">
-            {liveMsgCount > 0 ? 'Live session in progress' : 'Ready to start camera & mic'}
-          </div>
+          <div className="metric-card__value">{liveMsgCount}</div>
+          <div className="metric-card__label">Active Messages Transcribed</div>
         </div>
 
-        <div className="metric-card" onClick={() => onNavigate('sessions')} role="button" tabIndex={0}>
+        <div className="metric-card">
           <div className="metric-card__header">
-            <span className="metric-card__label">Saved Sessions</span>
-            <span className="metric-card__icon">📁</span>
+            <span className="metric-icon">👥</span>
+            <span className="metric-tag">Network</span>
+          </div>
+          <div className="metric-card__value">{onlineFriends.length}</div>
+          <div className="metric-card__label">Friends Online Now</div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-card__header">
+            <span className="metric-icon">📁</span>
+            <span className="metric-tag">History</span>
           </div>
           <div className="metric-card__value">{sessions.length}</div>
-          <div className="metric-card__sub">Archived conversation transcripts</div>
-        </div>
-
-        <div className="metric-card" onClick={() => onNavigate('friends')} role="button" tabIndex={0}>
-          <div className="metric-card__header">
-            <span className="metric-card__label">Friends Directory</span>
-            <span className="metric-card__icon">👥</span>
-          </div>
-          <div className="metric-card__value">{onlineFriends.length} Online</div>
-          <div className="metric-card__sub">{friendsData.friends.length} total contacts</div>
+          <div className="metric-card__label">Saved Sessions</div>
         </div>
       </div>
 
-      {/* 2-Column Content Grid: Recent Sessions & Quick Contacts */}
-      <div className="dashboard-content-grid">
-        {/* Recent Sessions */}
-        <div className="dash-card">
-          <div className="dash-card__header">
-            <div className="dash-card__title-wrap">
-              <span className="dash-card__icon">🕒</span>
-              <h3 className="dash-card__title">Recent Sessions</h3>
-            </div>
-            <button
-              type="button"
-              className="dash-link-btn"
-              onClick={() => onNavigate('sessions')}
-            >
-              View All →
-            </button>
-          </div>
-          <div className="dash-sessions-list">
-            {sessions.slice(0, 3).map((sess) => (
-              <div
-                key={sess.id}
-                className="dash-session-row"
-                onClick={() => onNavigate('sessions')}
-                role="button"
-                tabIndex={0}
+      {/* Quick Access Grid */}
+      <div className="dashboard-columns">
+        {/* Left Column: Quick Actions & Friends Online */}
+        <div className="dashboard-col">
+          <div className="card-panel">
+            <h3 className="card-panel__title">Quick Actions</h3>
+            <div className="quick-actions-grid">
+              <button
+                type="button"
+                className="action-tile"
+                onClick={() => onNavigate('sign-speak')}
               >
-                <div className="dash-session-main">
-                  <span className="dash-session-title">{sess.title}</span>
-                  <span className="dash-session-meta">
-                    {new Date(sess.startedAt).toLocaleDateString()} • {sess.messageCount} messages
-                  </span>
+                <span className="action-tile__icon">🤟</span>
+                <span className="action-tile__label">Sign & Speak Mode</span>
+              </button>
+              <button
+                type="button"
+                className="action-tile"
+                onClick={() => onNavigate('friends')}
+              >
+                <span className="action-tile__icon">👋</span>
+                <span className="action-tile__label">Message a Friend</span>
+              </button>
+              <button
+                type="button"
+                className="action-tile"
+                onClick={() => onNavigate('profile')}
+              >
+                <span className="action-tile__icon">⚙️</span>
+                <span className="action-tile__label">Edit Profile</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="card-panel">
+            <div className="card-panel__header-row">
+              <h3 className="card-panel__title">Online Contacts</h3>
+              <button
+                type="button"
+                className="btn-link"
+                onClick={() => onNavigate('friends')}
+              >
+                View all →
+              </button>
+            </div>
+            <div className="friends-list-mini">
+              {onlineFriends.map((friend) => (
+                <div key={friend.id} className="friend-row-mini">
+                  <div className="avatar-sm">
+                    {friend.avatar}
+                    <span className="status-dot status-dot--online" />
+                  </div>
+                  <div className="friend-info-mini">
+                    <span className="friend-name">{friend.name}</span>
+                    <span className="friend-role">{friend.role}</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-pill-small"
+                    onClick={() => onNavigate('sign-speak')}
+                  >
+                    Call
+                  </button>
                 </div>
-                <span className="dash-session-badge">Inspect</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Contacts & Quick Connect */}
-        <div className="dash-card">
-          <div className="dash-card__header">
-            <div className="dash-card__title-wrap">
-              <span className="dash-card__icon">🤝</span>
-              <h3 className="dash-card__title">Friends & Contacts</h3>
+        {/* Right Column: Recent Sessions Overview */}
+        <div className="dashboard-col">
+          <div className="card-panel">
+            <div className="card-panel__header-row">
+              <h3 className="card-panel__title">Recent Session Log</h3>
+              <button
+                type="button"
+                className="btn-link"
+                onClick={() => onNavigate('sessions')}
+              >
+                All sessions →
+              </button>
             </div>
-            <button
-              type="button"
-              className="dash-link-btn"
-              onClick={() => onNavigate('friends')}
-            >
-              Directory →
-            </button>
-          </div>
-          <div className="dash-friends-list">
-            {friendsData.friends.slice(0, 4).map((friend) => (
-              <div key={friend.id} className="dash-friend-row">
-                <div className="dash-friend-left">
-                  <div className="dash-friend-avatar">
-                    <span>{friend.avatar}</span>
-                    <span className={`status-indicator status-indicator--${friend.status}`} />
+            <div className="sessions-list-mini">
+              {sessions.slice(0, 3).map((sess) => (
+                <div key={sess.id} className="session-card-mini">
+                  <div className="session-card-mini__top">
+                    <span className="session-title">{sess.title}</span>
+                    <span className="session-date">{sess.date}</span>
                   </div>
-                  <div className="dash-friend-info">
-                    <span className="dash-friend-name">{friend.name}</span>
-                    <span className="dash-friend-role">{friend.role}</span>
+                  <p className="session-preview">"{sess.preview}"</p>
+                  <div className="session-card-mini__meta">
+                    <span className="meta-tag">{sess.messagesCount} msgs</span>
+                    <span className="meta-tag">{sess.duration}</span>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  className="dash-connect-btn"
-                  onClick={() => onNavigate('sign-speak')}
-                  title="Start Session"
-                >
-                  Connect
-                </button>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>

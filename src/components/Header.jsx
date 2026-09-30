@@ -1,16 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { AnimatedBackground } from './AnimatedBackground.jsx'
 import { getSettings, updateSettings, subscribeSettings } from '../services/settingsStore.js'
+import { getProfile, subscribeProfile } from '../services/profileStore.js'
 import CopyButton from './CopyButton.jsx'
 import signvoiceLogo from '../assets/signvoice-logo.jpg'
 
 export default function Header({ activeNav = 'dashboard', onNavigate, onNavigateLanding, onLogout, onOpenImportantInfo }) {
   const [settings, setSettings] = useState(getSettings())
+  const [profile, setProfile] = useState(getProfile())
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const menuRef = useRef(null)
 
   useEffect(() => {
     const unsub = subscribeSettings(setSettings)
+    return unsub
+  }, [])
+
+  useEffect(() => {
+    const unsub = subscribeProfile(setProfile)
     return unsub
   }, [])
 
@@ -208,8 +215,8 @@ export default function Header({ activeNav = 'dashboard', onNavigate, onNavigate
           tabIndex={0}
           title="Open Profile"
         >
-          <div className="topnav-avatar">AM</div>
-          <span className="topnav-username">Anshul</span>
+          <div className="topnav-avatar">{profile.avatar || 'AM'}</div>
+          <span className="topnav-username">{profile.username || 'Anshul'}</span>
         </div>
 
         {onLogout && (
