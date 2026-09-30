@@ -1,15 +1,39 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { AnimatedBackground } from './AnimatedBackground.jsx'
 import { getSettings, updateSettings, subscribeSettings } from '../services/settingsStore.js'
+import CopyButton from './CopyButton.jsx'
 import signvoiceLogo from '../assets/signvoice-logo.jpg'
 
-export default function Header({ activeNav = 'dashboard', onNavigate, onNavigateLanding, onLogout }) {
+export default function Header({ activeNav = 'dashboard', onNavigate, onNavigateLanding, onLogout, onOpenImportantInfo }) {
   const [settings, setSettings] = useState(getSettings())
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const menuRef = useRef(null)
 
   useEffect(() => {
     const unsub = subscribeSettings(setSettings)
     return unsub
   }, [])
+
+  // Close mobile menu on outside click or Esc key
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMobileMenuOpen(false)
+      }
+    }
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false)
+    }
+
+    if (mobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('keydown', handleKeyDown)
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [mobileMenuOpen])
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: 'grid' },
@@ -24,32 +48,52 @@ export default function Header({ activeNav = 'dashboard', onNavigate, onNavigate
     updateSettings({ darkMode: !settings.darkMode })
   }
 
+  const handleNavClick = (id) => {
+    if (onNavigate) onNavigate(id)
+    setMobileMenuOpen(false)
+  }
+
   return (
-    <header className="top-navbar" aria-label="Top Navigation Bar">
-      {/* LEFT: Brand Header */}
-      <div
-        className="topnav-brand"
-        onClick={() => onNavigateLanding ? onNavigateLanding() : (onNavigate && onNavigate('dashboard'))}
-        role="button"
-        tabIndex={0}
-        title="Return to Landing Page"
-        aria-label="SignVoice Home"
-      >
-        <div className="brand-logo-badge">
-          <img
-            src={signvoiceLogo}
-            alt="SignVoice"
-            className="brand-logo-img"
-            height="40"
+    <header className="top-navbar" aria-label="Top Navigation Bar" ref={menuRef}>
+      {/* LEFT: Brand Header & Meeting Share Badge */}
+      <div className="topnav-left-wrap">
+        <div
+          className="topnav-brand"
+          onClick={() => onNavigateLanding ? onNavigateLanding() : (onNavigate && onNavigate('dashboard'))}
+          role="button"
+          tabIndex={0}
+          title="Return to Landing Page"
+          aria-label="SignVoice Home"
+        >
+          <div className="brand-logo-badge">
+            <img
+              src={signvoiceLogo}
+              alt="SignVoice"
+              className="brand-logo-img"
+              height="40"
+            />
+          </div>
+        </div>
+
+        {/* Reusable Meeting ID Share Pill with Copy Button */}
+        <div className="topnav-meeting-pill" title="Current Meeting Session ID">
+          <span className="meeting-pill-tag">MEETING ID</span>
+          <span className="meeting-pill-id">ABC-12345</span>
+          <CopyButton
+            textToCopy="ABC-12345"
+            label="Copy ID"
+            toastMessage="Meeting ID copied!"
+            iconOnly={true}
+            className="meeting-copy-btn"
           />
         </div>
       </div>
 
-      {/* CENTER: Horizontal Floating Animated Navigation Capsule */}
-      <nav className="topnav-menu" aria-label="Main Floating Navigation">
+      {/* CENTER: Horizontal Floating Navigation Capsule (Desktop) */}
+      <nav className="topnav-menu topnav-menu--desktop" aria-label="Main Floating Navigation">
         <AnimatedBackground
           value={activeNav}
-          onValueChange={(id) => onNavigate && onNavigate(id)}
+          onValueChange={handleNavClick}
           className="topnav-animated-nav"
           enableHover={true}
         >
@@ -61,7 +105,7 @@ export default function Header({ activeNav = 'dashboard', onNavigate, onNavigate
                 data-id={item.id}
                 type="button"
                 className={`topnav-link ${isActive ? 'topnav-link--active' : ''}`}
-                onClick={() => onNavigate && onNavigate(item.id)}
+                onClick={() => handleNavClick(item.id)}
               >
                 <span className="topnav-link-icon" aria-hidden="true">
                   {item.icon === 'grid' && (
@@ -107,8 +151,25 @@ export default function Header({ activeNav = 'dashboard', onNavigate, onNavigate
         </AnimatedBackground>
       </nav>
 
-      {/* RIGHT: Theme Toggle, Online Status & Profile Pill */}
+      {/* RIGHT: Important Information Button, Theme Toggle, Online Status & Profile Pill */}
       <div className="topnav-right">
+        {/* Important Information Trigger Button */}
+        {onOpenImportantInfo && (
+          <button
+            type="button"
+            className="topnav-icon-btn"
+            onClick={onOpenImportantInfo}
+            title="Important Information"
+            aria-label="Important Information"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="topnav-btn-icon" width="18" height="18">
+              <circle cx="12" cy="12" r="9" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+          </button>
+        )}
+
         <button
           type="button"
           className="topnav-icon-btn"
@@ -165,7 +226,48 @@ export default function Header({ activeNav = 'dashboard', onNavigate, onNavigate
             <span>Log out</span>
           </button>
         )}
+
+        {/* Mobile Hamburger Toggle */}
+        <button
+          type="button"
+          className="topnav-mobile-hamburger"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-app-menu"
+          aria-label="Toggle Navigation Menu"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="22" height="22">
+            {mobileMenuOpen ? (
+              <line x1="18" y1="6" x2="6" y2="18" />
+            ) : (
+              <>
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </>
+            )}
+          </svg>
+        </button>
       </div>
+
+      {/* MOBILE APP MENU DRAWER */}
+      {mobileMenuOpen && (
+        <div id="mobile-app-menu" className="topnav-mobile-drawer">
+          <ul className="mobile-drawer-list">
+            {navItems.map((item) => (
+              <li key={item.id}>
+                <button
+                  type="button"
+                  className={`mobile-drawer-btn ${item.id === activeNav ? 'mobile-drawer-btn--active' : ''}`}
+                  onClick={() => handleNavClick(item.id)}
+                >
+                  <span>{item.label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </header>
   )
 }

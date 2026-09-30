@@ -192,12 +192,12 @@
 /* Hero Section */
 .landing-hero {
   position: relative;
-  min-height: 67vh;
+  min-height: 72vh;
   background: radial-gradient(ellipse at 85% 15%, rgba(244, 199, 154, 0.14) 0%, transparent 65%),
               linear-gradient(135deg, var(--bg-hero-start) 0%, var(--bg-hero-end) 100%);
   padding: 40px 5% 60px 5%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1.25fr;
   gap: 40px;
   align-items: center;
 }
@@ -242,6 +242,9 @@
 }
 
 .hero-cta-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
   opacity: 0;
   animation: heroFadeUp 0.6s ease forwards 0.5s;
 }
@@ -249,6 +252,29 @@
 .btn-hero-cta {
   font-size: 16px;
   padding: 14px 32px;
+}
+
+.btn-ghost-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(241, 231, 221, 0.08);
+  border: 1px solid rgba(241, 231, 221, 0.18);
+  color: var(--text-dark-secondary);
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 13px 20px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-ghost-info:hover {
+  color: var(--text-dark-primary);
+  background: rgba(241, 231, 221, 0.16);
+  border-color: rgba(241, 231, 221, 0.3);
+  transform: translateY(-1px);
 }
 
 /* Hero Right Art & Pipeline Row */
@@ -260,44 +286,49 @@
   justify-content: center;
   opacity: 0;
   animation: heroFadeIn 0.8s ease forwards 0.5s;
+  width: 100%;
 }
 
-.hero-art-container {
+.hero-art-container,
+.hero-art-container--large {
   position: relative;
   width: 100%;
-  max-width: 640px;
+  max-width: 760px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.hero-art-img {
+.hero-art-img,
+.hero-art-img--large {
   width: 100%;
-  max-width: 640px;
+  max-width: 760px;
   height: auto;
   display: block;
   object-fit: contain;
-  filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.4));
+  border-radius: 16px;
+  border: 1px solid rgba(241, 231, 221, 0.12);
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.45));
   transition: transform 0.3s ease;
 }
 
 /* 3-Step Row Over Pedestal */
 .hero-pipeline-row {
-  margin-top: -70px;
+  margin-top: -30px;
   position: relative;
   z-index: 10;
   width: 100%;
-  max-width: 540px;
-  background: rgba(42, 36, 32, 0.88);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(241, 231, 221, 0.12);
+  max-width: 580px;
+  background: rgba(42, 36, 32, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(241, 231, 221, 0.14);
   border-radius: var(--radius-card);
-  padding: 16px 14px;
+  padding: 16px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.4);
 }
 
 .pipeline-step-item {

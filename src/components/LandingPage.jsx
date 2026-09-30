@@ -1,27 +1,36 @@
 import React, { useState, useEffect, useRef } from 'react'
 import '../styles/landing.css'
 import LandingModal from './LandingModal.jsx'
+import FAQSection from './FAQSection.jsx'
+import CookieBanner from './CookieBanner.jsx'
+import BackToTop from './BackToTop.jsx'
+import Toast from './Toast.jsx'
+import ImportantInfoModal from './ImportantInfoModal.jsx'
 import signvoiceLogo from '../assets/signvoice-logo.jpg'
 
 export default function LandingPage({ onGetStarted }) {
   const [modalOpen, setModalOpen] = useState(false)
   const [modalTab, setModalTab] = useState('about')
+  const [infoModalOpen, setInfoModalOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const triggerRef = useRef(null)
 
-  // Support Deep Links (#about, #how-it-works, #features)
+  // Support Deep Links (#about, #how-it-works, #features, #faq)
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '')
       if (['about', 'how-it-works', 'features'].includes(hash)) {
         setModalTab(hash)
         setModalOpen(true)
+      } else if (hash === 'faq') {
+        const faqElem = document.getElementById('faq')
+        if (faqElem) {
+          faqElem.scrollIntoView({ behavior: 'smooth' })
+        }
       }
     }
 
-    // Check initial hash on load
     handleHashChange()
-
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
@@ -37,6 +46,15 @@ export default function LandingPage({ onGetStarted }) {
     setModalOpen(false)
     if (window.location.hash) {
       window.history.pushState(null, '', window.location.pathname)
+    }
+  }
+
+  const scrollToFaq = () => {
+    setMobileMenuOpen(false)
+    const faqElem = document.getElementById('faq')
+    if (faqElem) {
+      faqElem.scrollIntoView({ behavior: 'smooth' })
+      window.history.pushState(null, '', '#faq')
     }
   }
 
@@ -69,13 +87,16 @@ export default function LandingPage({ onGetStarted }) {
           </div>
         </button>
 
-        {/* Desktop Links */}
+        {/* Desktop Links: About | How It Works | Features | FAQ | Get Started */}
         <ul className={`landing-nav-links ${mobileMenuOpen ? 'landing-nav-links--mobile-open' : ''}`}>
           <li>
             <button
               type="button"
               className="landing-nav-link"
-              onClick={(e) => openModal('about', e.currentTarget)}
+              onClick={(e) => {
+                setMobileMenuOpen(false)
+                openModal('about', e.currentTarget)
+              }}
             >
               About
             </button>
@@ -84,7 +105,10 @@ export default function LandingPage({ onGetStarted }) {
             <button
               type="button"
               className="landing-nav-link"
-              onClick={(e) => openModal('how-it-works', e.currentTarget)}
+              onClick={(e) => {
+                setMobileMenuOpen(false)
+                openModal('how-it-works', e.currentTarget)
+              }}
             >
               How It Works
             </button>
@@ -93,7 +117,10 @@ export default function LandingPage({ onGetStarted }) {
             <button
               type="button"
               className="landing-nav-link"
-              onClick={(e) => openModal('features', e.currentTarget)}
+              onClick={(e) => {
+                setMobileMenuOpen(false)
+                openModal('features', e.currentTarget)
+              }}
             >
               Features
             </button>
@@ -101,8 +128,20 @@ export default function LandingPage({ onGetStarted }) {
           <li>
             <button
               type="button"
+              className="landing-nav-link"
+              onClick={scrollToFaq}
+            >
+              FAQ
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
               className="btn-pill"
-              onClick={onGetStarted}
+              onClick={() => {
+                setMobileMenuOpen(false)
+                onGetStarted()
+              }}
             >
               Get Started
             </button>
@@ -114,6 +153,8 @@ export default function LandingPage({ onGetStarted }) {
           type="button"
           className="landing-mobile-toggle"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="landing-mobile-nav"
           aria-label="Toggle navigation menu"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24">
@@ -130,7 +171,7 @@ export default function LandingPage({ onGetStarted }) {
         </button>
       </nav>
 
-      {/* 2. Hero Section */}
+      {/* 2. Hero Section: Left Text + Substantially Larger SignVoice AI Artwork on Right */}
       <section className="landing-hero" aria-label="Hero Section">
         {/* Left Column */}
         <div className="hero-left">
@@ -159,22 +200,35 @@ export default function LandingPage({ onGetStarted }) {
                 <polyline points="12 5 19 12 12 19" />
               </svg>
             </button>
+            <button
+              type="button"
+              className="btn-ghost-info"
+              onClick={() => setInfoModalOpen(true)}
+              title="Important Information"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                <circle cx="12" cy="12" r="9" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+              <span>Important Info</span>
+            </button>
           </div>
         </div>
 
-        {/* Right Column: 3D Artwork & 3-Step Pipeline Row */}
+        {/* Right Column: LARGE SignVoice AI Hero Artwork */}
         <div className="hero-right">
-          <div className="hero-art-container">
+          <div className="hero-art-container hero-art-container--large">
             <img
-              src="/assets/hero-art.webp"
-              alt="A hand gesture flowing into the SignVoice AI chip and out as sound waves"
+              src="/assets/hero-art.png"
+              alt="SignVoice AI visual pipeline showing hand gestures, AI processing chip, and voice audio waveform"
               loading="eager"
               fetchpriority="high"
-              className="hero-art-img"
+              className="hero-art-img hero-art-img--large"
             />
           </div>
 
-          {/* 3-step row with dashed arrows over pedestal */}
+          {/* 3-step row with dashed arrows */}
           <div className="hero-pipeline-row" role="region" aria-label="SignVoice 3-Step Pipeline">
             <button
               type="button"
@@ -217,7 +271,7 @@ export default function LandingPage({ onGetStarted }) {
         </div>
       </section>
 
-      {/* 3. Cream Feature Strip */}
+      {/* 3. Feature Strip */}
       <section className="landing-feature-strip" aria-label="Feature Summary">
         {/* Column 1: Sign to Speech */}
         <button
@@ -271,7 +325,12 @@ export default function LandingPage({ onGetStarted }) {
         </button>
       </section>
 
-      {/* 4. Dark Bottom Band */}
+      {/* 4. Expandable FAQ Section (placed before footer with id="faq") */}
+      <div id="faq">
+        <FAQSection />
+      </div>
+
+      {/* 5. Dark Bottom Band */}
       <footer className="landing-bottom-band" aria-label="Footer Tagline">
         <div className="bottom-band-curve" aria-hidden="true">
           <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
@@ -288,7 +347,7 @@ export default function LandingPage({ onGetStarted }) {
         </div>
       </footer>
 
-      {/* Modal Dialog */}
+      {/* Modal Dialogs */}
       <LandingModal
         isOpen={modalOpen}
         activeTab={modalTab}
@@ -297,6 +356,16 @@ export default function LandingPage({ onGetStarted }) {
         onGetStarted={onGetStarted}
         triggerRef={triggerRef}
       />
+
+      <ImportantInfoModal
+        isOpen={infoModalOpen}
+        onClose={() => setInfoModalOpen(false)}
+      />
+
+      {/* UX Overlays */}
+      <CookieBanner />
+      <BackToTop />
+      <Toast />
     </div>
   )
 }

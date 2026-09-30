@@ -13,6 +13,10 @@ import ProfileView from './views/ProfileView.jsx'
 import SettingsView from './views/SettingsView.jsx'
 import MeetingRoom from './components/meeting/MeetingRoom.jsx'
 import { generateMeetingId } from './utils/meetingId.js'
+import CookieBanner from './components/CookieBanner.jsx'
+import BackToTop from './components/BackToTop.jsx'
+import Toast from './components/Toast.jsx'
+import ImportantInfoModal from './components/ImportantInfoModal.jsx'
 
 function getMeetingIdFromPath(pathname) {
   const match = (pathname || '').match(/^\/meeting\/([A-Za-z0-9_-]+)/)
@@ -41,6 +45,7 @@ export default function App() {
   })
 
   const [activeNav, setActiveNav] = useState('dashboard')
+  const [infoModalOpen, setInfoModalOpen] = useState(false)
 
   // Handle browser back/forward button navigation
   useEffect(() => {
@@ -139,10 +144,14 @@ export default function App() {
 
   if (view === 'login') {
     return (
-      <LoginView
-        onLoginSuccess={handleLoginSuccess}
-        onBackToLanding={handleNavigateLanding}
-      />
+      <>
+        <LoginView
+          onLoginSuccess={handleLoginSuccess}
+          onBackToLanding={handleNavigateLanding}
+        />
+        <CookieBanner />
+        <Toast />
+      </>
     )
   }
 
@@ -154,6 +163,7 @@ export default function App() {
         onNavigate={setActiveNav}
         onNavigateLanding={handleNavigateLanding}
         onLogout={handleLogout}
+        onOpenImportantInfo={() => setInfoModalOpen(true)}
       />
 
       {/* 2. Main Workspace Content Area below Topbar */}
@@ -206,6 +216,15 @@ export default function App() {
           </main>
         )}
       </div>
+
+      {/* Polish UX Overlays */}
+      <CookieBanner />
+      <BackToTop />
+      <Toast />
+      <ImportantInfoModal
+        isOpen={infoModalOpen}
+        onClose={() => setInfoModalOpen(false)}
+      />
     </div>
   )
 }

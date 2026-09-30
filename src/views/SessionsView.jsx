@@ -6,6 +6,7 @@ import {
   deleteSession,
 } from '../services/sessionStore.js'
 import { getMessages } from '../services/conversationStore.js'
+import CopyButton from '../components/CopyButton.jsx'
 
 export default function SessionsView({ onNavigate }) {
   const [sessions, setSessions] = useState(getSessions())
@@ -158,13 +159,27 @@ export default function SessionsView({ onNavigate }) {
                     <span>Total messages: {selectedSession.messages?.length || 0}</span>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  className="btn-ghost-small"
-                  onClick={() => onNavigate('sign-speak')}
-                >
-                  Resume in Live Session →
-                </button>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <CopyButton
+                    textToCopy={
+                      selectedSession.messages && selectedSession.messages.length > 0
+                        ? selectedSession.messages
+                            .map((m) => `${m.sender === 'sign_user' || m.type === 'sign' ? 'Signer' : 'Speaker'}: ${m.text}`)
+                            .join('\n')
+                        : selectedSession.title
+                    }
+                    label="Copy Transcript"
+                    toastMessage="Session transcript copied!"
+                    className="btn-ghost-small"
+                  />
+                  <button
+                    type="button"
+                    className="btn-ghost-small"
+                    onClick={() => onNavigate('sign-speak')}
+                  >
+                    Resume in Live Session →
+                  </button>
+                </div>
               </div>
 
               <div className="transcript-messages-scroll">
