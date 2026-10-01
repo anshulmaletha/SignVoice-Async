@@ -1,175 +1,271 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { startGestureRecognition } from './gesture/GestureRecognizer';
+import React, { useState, useEffect } from 'react'
+import './App.css'
+import LandingPage from './components/LandingPage.jsx'
+import LoginView from './views/LoginView.jsx'
+import Header from './components/Header.jsx'
+import SignUserPanel from './components/SignUserPanel.jsx'
+import SpeechUserPanel from './components/SpeechUserPanel.jsx'
+import ConversationHistory from './components/ConversationHistory.jsx'
+import QuickMessages from './components/QuickMessages.jsx'
+import DashboardView from './views/DashboardView.jsx'
+import SessionsView from './views/SessionsView.jsx'
+import FriendsView from './views/FriendsView.jsx'
+import ProfileView from './views/ProfileView.jsx'
+import SettingsView from './views/SettingsView.jsx'
+import MeetingRoom from './components/meeting/MeetingRoom.jsx'
+import { generateMeetingId } from './utils/meetingId.js'
+import CookieBanner from './components/CookieBanner.jsx'
+import BackToTop from './components/BackToTop.jsx'
+import Toast from './components/Toast.jsx'
+import ImportantInfoModal from './components/ImportantInfoModal.jsx'
+import { setActiveProfile, clearActiveProfile } from './services/profileStore.js'
+
+const APP_NAV_ROUTES = ['dashboard', 'sign-speak', 'sessions', 'friends', 'profile', 'settings']
+
+function getMeetingIdFromPath(pathname) {
+  const match = (pathname || '').match(/^\/meeting\/([A-Za-z0-9_-]+)/)
+  return match ? match[1] : null
+}
+
+function getNavFromPath(pathname) {
+  const clean = (pathname || '').replace(/^\/+|\/+$/g, '').toLowerCase()
+  if (APP_NAV_ROUTES.includes(clean)) {
+    return clean
+  }
+  return null
+}
 
 export default function App() {
-  const videoRef = useRef(null);
-  const [status, setStatus] = useState('Idle');
-  const [error, setError] = useState(null);
-  const [currentGesture, setCurrentGesture] = useState({
-    gesture: 'NONE',
-    text: '',
-    confidence: 0,
-    timestamp: new Date().toLocaleTimeString()
-  });
-  const recognitionControlRef = useRef(null);
-  const streamRef = useRef(null);
+  const [currentMeetingId, setCurrentMeetingId] = useState(() => {
+    return getMeetingIdFromPath(window.location.pathname)
+  })
 
-  const startWebcamAndRecognition = async () => {
-    try {
-      setError(null);
-      setStatus('Requesting camera permission...');
-
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Camera API (navigator.mediaDevices.getUserMedia) not supported in this browser.');
-      }
-
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width: { ideal: 640 },
-          height: { ideal: 480 },
-          facingMode: 'user'
-        },
-        audio: false
-      });
-
-      streamRef.current = stream;
-
-      if (!videoRef.current) {
-        throw new Error('Video element reference is missing.');
-      }
-
-      videoRef.current.srcObject = stream;
-      setStatus('Waiting for video stream...');
-
-      await new Promise((resolve) => {
-        if (videoRef.current.readyState >= 2) {
-          resolve();
-        } else {
-          videoRef.current.onloadeddata = () => resolve();
-        }
-      });
-
-      await videoRef.current.play();
-      setStatus('Loading MediaPipe GestureRecognizer model...');
-
-      const control = await startGestureRecognition(
-        videoRef.current,
-        (gestureResult) => {
-          // Callback receives GESTURE_OUTPUT contract: { gesture, text, confidence, timestamp }
-          setCurrentGesture(gestureResult);
-        },
-        {
-          logIntervalMs: 300,
-          enableConsoleLogging: true
-        }
-      );
-
-      recognitionControlRef.current = control;
-      setStatus('Running (Check Browser Console)');
-    } catch (err) {
-      console.error('[GestureRecognizer] Camera or initialization error:', err);
-      let message = err.message || 'Unknown error occurred.';
-      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-        message = 'Camera permission denied.';
-      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-        message = 'Camera unavailable or not found.';
-      }
-      setError(`[GestureRecognizer] ${message}`);
-      setStatus('Error');
+  const [view, setView] = useState(() => {
+    const path = window.location.pathname
+    const meetingId = getMeetingIdFromPath(path)
+    if (meetingId) {
+      return 'meeting'
     }
-  };
+    const isAuth = sessionStorage.getItem('signvoice_auth') === 'true'
+    const navRoute = getNavFromPath(path)
+    if (path === '/app' || path === '/app/' || navRoute) {
+      return isAuth ? 'app' : 'login'
+    }
+    if (path === '/login' || path === '/login/') {
+      return 'login'
+    }
+    return 'landing'
+  })
 
-  const stopWebcamAndRecognition = () => {
-    if (recognitionControlRef.current) {
-      recognitionControlRef.current.stop();
-      recognitionControlRef.current = null;
-    }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-    setStatus('Stopped');
-    setCurrentGesture({ gesture: 'NONE', text: '', confidence: 0, timestamp: new Date().toLocaleTimeString() });
-  };
+  const [activeNav, setActiveNav] = useState(() => {
+    const navRoute = getNavFromPath(window.location.pathname)
+    return navRoute || 'dashboard'
+  })
+  const [infoModalOpen, setInfoModalOpen] = useState(false)
 
+  // Handle browser back/forward button navigation
   useEffect(() => {
-    return () => {
-      // Cleanup on unmount
-      if (recognitionControlRef.current) {
-        recognitionControlRef.current.stop();
+    const handlePopState = () => {
+      const path = window.location.pathname
+      const meetingId = getMeetingIdFromPath(path)
+
+      if (meetingId) {
+        setCurrentMeetingId(meetingId)
+        setView('meeting')
+        return
       }
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
+
+      setCurrentMeetingId(null)
+      const isAuth = sessionStorage.getItem('signvoice_auth') === 'true'
+      const navRoute = getNavFromPath(path)
+
+      if (path === '/app' || path === '/app/' || navRoute) {
+        if (isAuth) {
+          setView('app')
+          setActiveNav(navRoute || 'dashboard')
+        } else {
+          sessionStorage.setItem('signvoice_redirect', navRoute || 'dashboard')
+          setView('login')
+          window.history.replaceState(null, '', '/login')
+        }
+      } else if (path === '/login' || path === '/login/') {
+        setView('login')
+      } else {
+        setView('landing')
       }
-    };
-  }, []);
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
+  const navigateTo = (targetView, path) => {
+    setView(targetView)
+    if (path && window.location.pathname !== path) {
+      window.history.pushState(null, '', path)
+    }
+  }
+
+  const handleNavChange = (id) => {
+    setActiveNav(id)
+    const targetPath = id === 'dashboard' ? '/app' : `/${id}`
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState(null, '', targetPath)
+    }
+  }
+
+  const handleGetStarted = () => {
+    const isAuth = sessionStorage.getItem('signvoice_auth') === 'true'
+    if (isAuth) {
+      navigateTo('app', '/app')
+      setActiveNav('dashboard')
+    } else {
+      navigateTo('login', '/login')
+    }
+  }
+
+  const handleLoginSuccess = (username) => {
+    if (username) {
+      setActiveProfile(username)
+    }
+    sessionStorage.setItem('signvoice_auth', 'true')
+    const redirectNav = sessionStorage.getItem('signvoice_redirect')
+    sessionStorage.removeItem('signvoice_redirect')
+    const targetNav = redirectNav || 'dashboard'
+    const targetPath = targetNav === 'dashboard' ? '/app' : `/${targetNav}`
+    navigateTo('app', targetPath)
+    setActiveNav(targetNav)
+  }
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('signvoice_auth')
+    sessionStorage.removeItem('signvoice_redirect')
+    clearActiveProfile()
+    navigateTo('login', '/login')
+  }
+
+  const handleCreateMeeting = (meetingId) => {
+    const id = meetingId || generateMeetingId()
+    setCurrentMeetingId(id)
+    navigateTo('meeting', `/meeting/${id}`)
+  }
+
+  const handleLeaveMeeting = () => {
+    setCurrentMeetingId(null)
+    const isAuth = sessionStorage.getItem('signvoice_auth') === 'true'
+    if (isAuth) {
+      navigateTo('app', '/app')
+      setActiveNav('dashboard')
+    } else {
+      navigateTo('landing', '/')
+    }
+  }
+
+  const handleNavigateLanding = () => {
+    navigateTo('landing', '/')
+  }
+
+  if (view === 'meeting' && currentMeetingId) {
+    return (
+      <MeetingRoom
+        meetingId={currentMeetingId}
+        onLeaveMeeting={handleLeaveMeeting}
+      />
+    )
+  }
+
+  if (view === 'landing') {
+    return <LandingPage onGetStarted={handleGetStarted} />
+  }
+
+  if (view === 'login') {
+    return (
+      <>
+        <LoginView
+          onLoginSuccess={handleLoginSuccess}
+          onBackToLanding={handleNavigateLanding}
+        />
+        <CookieBanner />
+        <Toast />
+      </>
+    )
+  }
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'monospace' }}>
-      <h2>SignVoice — Task A2 Test Harness (GESTURE_OUTPUT Contract)</h2>
-      <p>
-        <strong>Status:</strong> {status}
-      </p>
-      {error && (
-        <div style={{ color: 'red', margin: '10px 0' }}>
-          <strong>Error:</strong> {error}
-        </div>
-      )}
+    <div className="app-container">
+      {/* 1. Horizontal Top Navigation Bar */}
+      <Header
+        activeNav={activeNav}
+        onNavigate={handleNavChange}
+        onNavigateLanding={handleNavigateLanding}
+        onLogout={handleLogout}
+        onOpenImportantInfo={() => setInfoModalOpen(true)}
+      />
 
-      <div style={{ marginBottom: '15px' }}>
-        <button
-          onClick={startWebcamAndRecognition}
-          style={{ padding: '8px 16px', marginRight: '10px', cursor: 'pointer' }}
-        >
-          Start Webcam & Recognizer
-        </button>
-        <button
-          onClick={stopWebcamAndRecognition}
-          style={{ padding: '8px 16px', cursor: 'pointer' }}
-        >
-          Stop
-        </button>
+      {/* 2. Main Workspace Content Area below Topbar */}
+      <div className="app-main">
+        {activeNav === 'sign-speak' && (
+          <div className="sign-speak-workspace">
+            <div className="workspace-columns">
+              {/* Center / Left Column: Real Webcam Feed & Gesture Results */}
+              <main className="column-vision" aria-label="Sign Language Vision Workspace">
+                <SignUserPanel />
+              </main>
+
+              {/* Right Column: Speech Recognition & Live Conversation Feed */}
+              <aside className="column-speech-chat" aria-label="Speech and Live Conversation Workspace">
+                <SpeechUserPanel />
+                <ConversationHistory />
+              </aside>
+            </div>
+
+            {/* Quick Messages Section below the main interface */}
+            <QuickMessages />
+          </div>
+        )}
+
+        {activeNav === 'dashboard' && (
+          <main className="workspace-view" aria-label="Dashboard Overview">
+            <DashboardView
+              onNavigate={handleNavChange}
+              onCreateMeeting={() => handleCreateMeeting()}
+            />
+          </main>
+        )}
+
+        {activeNav === 'sessions' && (
+          <main className="workspace-view" aria-label="Past Sessions">
+            <SessionsView onNavigate={handleNavChange} />
+          </main>
+        )}
+
+        {activeNav === 'friends' && (
+          <main className="workspace-view" aria-label="Friends and Contacts">
+            <FriendsView onNavigate={handleNavChange} />
+          </main>
+        )}
+
+        {activeNav === 'profile' && (
+          <main className="workspace-view" aria-label="User Profile">
+            <ProfileView onNavigate={handleNavChange} />
+          </main>
+        )}
+
+        {activeNav === 'settings' && (
+          <main className="workspace-view" aria-label="Settings and Preferences">
+            <SettingsView onNavigate={handleNavChange} />
+          </main>
+        )}
       </div>
 
-      <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-        <video
-          ref={videoRef}
-          playsInline
-          muted
-          style={{
-            width: '480px',
-            height: '360px',
-            backgroundColor: '#000',
-            border: '1px solid #ccc'
-          }}
-        />
-        <div
-          style={{
-            padding: '10px',
-            border: '1px solid #ddd',
-            backgroundColor: '#f9f9f9',
-            minWidth: '280px'
-          }}
-        >
-          <h4>Current GESTURE_OUTPUT</h4>
-          <p>
-            <strong>gesture:</strong> {currentGesture.gesture}
-          </p>
-          <p>
-            <strong>text:</strong> {currentGesture.text || '""'}
-          </p>
-          <p>
-            <strong>confidence:</strong> {currentGesture.confidence ? currentGesture.confidence.toFixed(2) : 0}
-          </p>
-          <p>
-            <strong>timestamp:</strong> {currentGesture.timestamp}
-          </p>
-          <small>Open DevTools Console (F12) for real-time logs.</small>
-        </div>
-      </div>
+      {/* Polish UX Overlays */}
+      <CookieBanner />
+      <BackToTop />
+      <Toast />
+      <ImportantInfoModal
+        isOpen={infoModalOpen}
+        onClose={() => setInfoModalOpen(false)}
+      />
     </div>
-  );
+  )
 }
