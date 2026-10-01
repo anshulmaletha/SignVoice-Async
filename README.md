@@ -16,22 +16,7 @@
 
 ![SignVoice](public/assets/hero-art.png)
 
-## 🖼️ **Product Screenshots**
 
-### **1. Landing Page**
-<p align="center">
-  <img src="docs/screenshots/landing-page.jpg" alt="SignVoice landing page" width="360" height="176" />
-</p>
-
-### **2. Login / Authentication**
-<p align="center">
-  <img src="docs/screenshots/login-page.jpg" alt="SignVoice login page" width="360" height="176" />
-</p>
-
-### **3. Live Sign + Speech Workspace**
-<p align="center">
-  <img src="docs/screenshots/meeting-workspace.jpg" alt="SignVoice live sign and speech workspace" width="360" height="176" />
-</p>
 
 > **The three screenshots above are intentionally rendered at the same compact size so the README stays clean and easy to scan.**
 
