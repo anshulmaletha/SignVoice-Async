@@ -17,9 +17,6 @@
 ![SignVoice](public/assets/hero-art.png)
 
 
-
-> **The three screenshots above are intentionally rendered at the same compact size so the README stays clean and easy to scan.**
-
 ---
 
 # 📚 **Table of Contents**
