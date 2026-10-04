@@ -10,8 +10,8 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 > **SignVoice combines a live two-person video call with sign-language recognition, speech-to-text, text chat, live captions, and text-to-speech — all inside the same meeting experience.**
-
-**Live demo:** https://sign-voice-async.vercel.app
+ 
+**Live demo:** https://sign-voice-async.vercel.app  
 **Repository:** https://github.com/anshulmaletha/SignVoice-Async
 
 ![SignVoice](public/assets/hero-art.png)
